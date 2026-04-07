@@ -35,7 +35,7 @@ D.dialog = {
             {"boss", "At least you're honest about it."},
         },
     },
-    thornweaver = {
+    briarwen = {
         loyalist = {
             {"boss", "Steel and banners. The forest has no use for either."},
             {"hero", "We're passing through. Step aside or be cut down."},
@@ -64,7 +64,7 @@ D.dialog = {
             {"hero", "Seemed practical."},
         },
     },
-    gutripper = {
+    maggash = {
         loyalist = {
             {"boss", "WAAAGH! Humans! Get 'em, boys!"},
             {"hero", "Form ranks! Hold the line!"},
@@ -117,7 +117,7 @@ D.dialog = {
             {"hero", "Creepy. Very creepy. Let's get this over with."},
         },
     },
-    embercrest = {
+    sithrak = {
         loyalist = {
             {"boss", "Humans. You build with stone and wonder why it crumbles. We build with fire."},
             {"hero", "Fire dies. Stone endures. We'll see which lasts longer."},

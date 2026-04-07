@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 -- Dry grass base — the signature plains look
 local tiles = H.init_map(W, HT, "Gs")
 
@@ -56,7 +56,6 @@ end
 -- Fill: keep it yellow/dry — no green grass
 H.fill_pass(tiles, W, HT, "Gs", {"Gd", "Gs"}, 30)
 
-H.scatter_villages(tiles, W, HT, {"Gg^Vh", "Gg^Vwm", "Hh^Vhh", "Gg^Vhc"}, {"Gs", "Gd", "Hh"}, H.rand(6, 9))
 
 -- NO border trees for plains — just gentle hills at edges
 -- (plains are supposed to be open and flat)
@@ -69,4 +68,5 @@ local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gs", {"Ke", "Kh"}, {"C
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rr")
 H.place_bridges(tiles, W, HT, path)
 
+H.scatter_villages(tiles, W, HT, {"Gg^Vh", "Gg^Vwm", "Hh^Vhh", "Gg^Vhc"}, {"Gs", "Gd", "Hh"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

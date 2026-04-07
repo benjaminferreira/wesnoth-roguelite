@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Dd")
 
 for _ = 1, H.rand(4, 7) do H.place_cluster(tiles, W, HT, H.rand(4, W-3), H.rand(4, HT-3), "Ds", H.rand(2, 3)) end
@@ -29,11 +29,11 @@ for y = 1, HT do for x = 1, W do
 end end
 
 H.fill_pass(tiles, W, HT, "Dd", {"Ds", "Hd", "Dd^Edp", "Dd^Esd"}, 35)
-H.scatter_villages(tiles, W, HT, {"Dd^Vda", "Dd^Vdt", "Ds^Vdt"}, {"Dd", "Ds", "Hd"}, 5)
 H.dense_borders(tiles, W, HT, {"Hd", "Dd", "Mdd", "Hd"}, "Mdd")
 
 H.maybe_scatter_ruins(tiles, W, HT, {"Dd", "Ds"}, 25)
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Dd", {"Kd", "Ke"}, {"Cd", "Ce"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rd", "Ds")
 H.place_bridges(tiles, W, HT, path)
+H.scatter_villages(tiles, W, HT, {"Dd^Vda", "Dd^Vdt", "Ds^Vdt"}, {"Dd", "Ds", "Hd"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

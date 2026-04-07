@@ -1,7 +1,7 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
 -- Cave: sometimes narrow corridor, sometimes open cavern
 local narrow = H.rand(1, 3) == 1
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 if narrow then W, HT = HT, W end
 
 -- Start with cave floor, then ADD walls as obstacles
@@ -73,9 +73,6 @@ for y = 1, HT do
 end
 
 -- Villages
-H.scatter_villages(tiles, W, HT,
-    {"Uu^Vu", "Uu^Vud"},
-    {"Uu", "Uue", "Ur"}, 4)
 
 -- Fixtures
 H.maybe_fixture(tiles, W, HT, "cave_lake", 40)
@@ -102,4 +99,7 @@ local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Uu",
 -- Path (mostly cosmetic since cave is already open)
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Ur", "Uu")
 
+H.scatter_villages(tiles, W, HT,
+    {"Uu^Vu", "Uu^Vud"},
+    {"Uu", "Uue", "Ur"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

@@ -1,7 +1,7 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
 -- Mountains: sometimes a narrow pass (vertical), sometimes wide
 local narrow = H.rand(1, 3) == 1
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 if narrow then W, HT = HT, W end  -- flip for narrow pass
 local tiles = H.init_map(W, HT, "Hh")
 
@@ -49,10 +49,10 @@ H.maybe_fixture(tiles, W, HT, "pit", 10)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 10)
 
 H.fill_pass(tiles, W, HT, "Hh", {"Gd", "Gg", "Hhd"}, 25)
-H.scatter_villages(tiles, W, HT, {"Hh^Vhh", "Gg^Vh", "Gg^Vl"}, {"Hh", "Gg", "Gd"}, 5)
 H.dense_borders(tiles, W, HT, {"Mm", "Mm", "Hh", "Mm^Xm"}, "Mm^Xm")
 
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Kh"}, {"Ce", "Ch"}, narrow)
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Gd", "Rb")
 H.place_bridges(tiles, W, HT, path)
+H.scatter_villages(tiles, W, HT, {"Hh^Vhh", "Gg^Vh", "Gg^Vl"}, {"Hh", "Gg", "Gd"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

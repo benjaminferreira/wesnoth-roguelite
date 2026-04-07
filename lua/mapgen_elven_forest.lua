@@ -1,6 +1,6 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
 -- Elven forest: taller, narrower — feels like a deep forest corridor
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Gg")
 
 -- Elven-specific trees: great trees, deciduous, tropical (no pine!)
@@ -40,7 +40,6 @@ if H.rand(1,2) == 1 then
 end
 
 H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs", "Gll", "Gg^Efm"}, 40)
-H.scatter_villages(tiles, W, HT, {"Gg^Ve", "Gg^Ve", "Gg^Vl", "Gg^Ve"}, {"Gg", "Gd", "Gs", "Gll"}, H.rand(5, 7))
 if H.rand(1,2) == 1 then H.scatter_specials(tiles, W, HT, {"Gg^Efm", "Gg^Em"}, {"Gg", "Gd"}, H.rand(3, 6)) end
 H.dense_borders(tiles, W, HT, {"Gg^Fds", "Gg^Fms", "Gg^Fet", "Hh"}, nil)
 
@@ -49,4 +48,5 @@ local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Kv", "Kv"}, {"C
 -- Overgrown cobble path (not a road — feels more natural)
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rp", "Gll")
 H.place_bridges(tiles, W, HT, path)
+H.scatter_villages(tiles, W, HT, {"Gg^Ve", "Gg^Ve", "Gg^Vl", "Gg^Ve"}, {"Gg", "Gd", "Gs", "Gll"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

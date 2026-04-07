@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Gg")
 
 -- Pick season (NO winter — that's a separate biome)
@@ -60,7 +60,6 @@ H.fill_pass(tiles, W, HT, "Gg", grounds, 40)
 -- Villages
 local vtypes = {"Gg^Vh", "Gg^Ve", "Gg^Vl"}
 if season == "fall" then vtypes = {"Gg^Vh", "Gg^Ve", "Gg^Vc"} end
-H.scatter_villages(tiles, W, HT, vtypes, {"Gg", "Gd", "Gs", "Gll", "Hh"}, H.rand(5, 7))
 
 -- Embellishments
 if H.rand(1,2) == 1 then H.scatter_specials(tiles, W, HT, {"Gg^Efm"}, {"Gg", "Gd", "Gs"}, H.rand(3, 6)) end
@@ -79,4 +78,5 @@ local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg",
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rr")
 H.place_bridges(tiles, W, HT, path)
 
+H.scatter_villages(tiles, W, HT, vtypes, {"Gg", "Gd", "Gs", "Gll", "Hh"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

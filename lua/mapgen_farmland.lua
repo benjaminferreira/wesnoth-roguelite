@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Gg")
 
 -- Trees and hills first
@@ -12,7 +12,6 @@ if H.rand(1, 100) <= 60 then
 end
 
 H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs"}, 35)
-H.scatter_villages(tiles, W, HT, {"Gg^Vh", "Gg^Vwm", "Gg^Vh", "Gg^Vhc"}, {"Gg", "Gd"}, H.rand(7, 9))
 
 -- Path and road FIRST
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Kh"}, {"Ce", "Ch"})
@@ -41,4 +40,5 @@ H.maybe_fixture(tiles, W, HT, "hill_fort", 15)
 H.maybe_fixture(tiles, W, HT, "dead_grove", 10)
 H.maybe_fixture(tiles, W, HT, "stone_circle", 10)
 
+H.scatter_villages(tiles, W, HT, {"Gg^Vh", "Gg^Vwm", "Gg^Vh", "Gg^Vhc"}, {"Gg", "Gd"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

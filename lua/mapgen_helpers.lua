@@ -14,21 +14,71 @@ function H.rand(min, max)
     return wesnoth.random(min, max)
 end
 
+-- Check if a tile is a village (never overwrite villages)
+function H.is_village(terrain)
+    return terrain and terrain:find("%^V") ~= nil
+end
+
 -- Random map size: shared pool for all biomes
 -- Returns width, height
 function H.random_map_size()
-    local sizes = {
-        {34, 22},  -- wide standard
-        {32, 24},  -- balanced
-        {30, 26},  -- tall-ish
-        {36, 22},  -- extra wide
-        {28, 28},  -- square
-        {32, 22},  -- medium wide
+    -- Map sizes by category
+    local small = {
+        {28, 22},  -- compact
         {30, 22},  -- compact wide
-        {34, 24},  -- large
+        {28, 24},  -- compact tall
+        {30, 24},  -- small balanced
     }
-    local pick = sizes[H.rand(1, #sizes)]
-    return pick[1], pick[2]
+    local medium = {
+        {32, 24},  -- balanced
+        {34, 22},  -- wide standard
+        {30, 26},  -- tall-ish
+        {32, 22},  -- medium wide
+        {28, 28},  -- square
+    }
+    local large = {
+        {34, 24},  -- large
+        {36, 24},  -- large wide
+        {34, 26},  -- large tall
+        {38, 24},  -- extra wide
+        {36, 26},  -- extra large
+        {32, 30},  -- tall large
+    }
+
+    -- Battle number determines size weighting
+    -- Early = mostly small, late = mostly large
+    local bn = 1
+    if wesnoth and wesnoth.get_variable then
+        local ok, val = pcall(wesnoth.get_variable, "battle_number")
+        if ok and val then bn = val end
+    end
+
+    local pool
+    if bn <= 4 then
+        -- Early: 60% small, 30% medium, 10% large
+        local roll = H.rand(1, 10)
+        if roll <= 6 then pool = small
+        elseif roll <= 9 then pool = medium
+        else pool = large end
+    elseif bn <= 9 then
+        -- Mid: 20% small, 50% medium, 30% large
+        local roll = H.rand(1, 10)
+        if roll <= 2 then pool = small
+        elseif roll <= 7 then pool = medium
+        else pool = large end
+    else
+        -- Late: 10% small, 30% medium, 60% large
+        local roll = H.rand(1, 10)
+        if roll <= 1 then pool = small
+        elseif roll <= 4 then pool = medium
+        else pool = large end
+    end
+
+    local pick = pool[H.rand(1, #pool)]
+    local area = pick[1] * pick[2]
+    -- small < 700 tiles, large >= 800
+    local size_category = area < 700 and "small" or (area >= 800 and "large" or "medium")
+    return pick[1], pick[2], size_category
 end
 
 -- Hex grid utilities (Wesnoth staggered columns, 1-indexed)
@@ -78,7 +128,7 @@ function H.place_cluster(tiles, width, height, cx, cy, terrain, size)
                 -- Use euclidean distance for rounder shapes
                 local dist = math.sqrt(dx * dx + dy * dy)
                 if dist <= size + 0.5 and H.rand(1, 100) > dist * 15 then
-                    if tiles[y][x] ~= "Re^Gvs" then tiles[y][x] = terrain end
+                    if not H.is_village(tiles[y][x]) and tiles[y][x] ~= "Re^Gvs" then tiles[y][x] = terrain end
                 end
             end
         end
@@ -746,11 +796,26 @@ function H.place_castles(tiles, width, height, base, keep_types, castle_types, v
 end
 
 -- Rule 7: Scatter varied village types
-function H.scatter_villages(tiles, width, height, village_types, valid_terrains, count)
+function H.scatter_villages(tiles, width, height, village_types, valid_terrains, count, size_category)
+    -- Override count based on map size if size_category provided
+    -- These are NON-center villages. Center village is added separately.
+    if size_category then
+        if size_category == "small" then
+            count = H.rand(4, 5)
+        elseif size_category == "large" then
+            count = H.rand(5, 7)
+        else
+            count = H.rand(5, 6)
+        end
+    end
+    local min_villages = math.max(4, count)  -- absolute floor: 4 non-center + 1 center = 5 total
+
     local placed = 0
     local attempts = 0
     local mid = math.floor(width / 2)
     local left_count, right_count = 0, 0
+    -- Track placed village positions for spacing check
+    local village_locs = {}
 
     while placed < count and attempts < 300 do
         local vx
@@ -768,19 +833,109 @@ function H.scatter_villages(tiles, width, height, village_types, valid_terrains,
             if t == vt then valid = true; break end
         end
         if valid then
-            tiles[vy][vx] = village_types[H.rand(1, #village_types)]
-            placed = placed + 1
-            if vx <= mid then left_count = left_count + 1
-            else right_count = right_count + 1 end
+            -- Check spacing: no village within 2 hexes
+            local too_close = false
+            for _, loc in ipairs(village_locs) do
+                if math.abs(vx - loc[1]) + math.abs(vy - loc[2]) <= 2 then
+                    too_close = true; break
+                end
+            end
+            if not too_close then
+                tiles[vy][vx] = village_types[H.rand(1, #village_types)]
+                placed = placed + 1
+                table.insert(village_locs, {vx, vy})
+                if vx <= mid then left_count = left_count + 1
+                else right_count = right_count + 1 end
+            end
         end
         attempts = attempts + 1
     end
 
-    -- Contested center village
-    local cy = H.rand(math.floor(height/2) - 1, math.floor(height/2) + 1)
-    local cx = H.rand(math.floor(width/2) - 2, math.floor(width/2) + 2)
-    if cx >= 1 and cx <= width and cy >= 1 and cy <= height then
-        tiles[cy][cx] = village_types[H.rand(1, #village_types)]
+    -- Fallback: force-place on any safe tile if minimum not met
+    -- Relax spacing constraints progressively if still failing
+    if placed < min_villages then
+        local function is_blocked(t)
+            if t:find("^X") or t:find("^_") then return true end
+            if t == "Wo" or t == "Wog" then return true end
+            if t:find("^Q") then return true end
+            if t:find("^K") or t:find("^C") then return true end
+            if t:find("%^V") then return true end
+            if t:find("%^B") then return true end
+            return false
+        end
+
+        local function near_castle(x, y, dist)
+            for dy = -dist, dist do
+                for dx = -dist, dist do
+                    local nx, ny = x + dx, y + dy
+                    if nx >= 1 and nx <= width and ny >= 1 and ny <= height then
+                        local nt = tiles[ny][nx]
+                        if nt:find("^K") or nt:find("^C") then return true end
+                    end
+                end
+            end
+            return false
+        end
+
+        local function near_village(x, y, dist)
+            for _, loc in ipairs(village_locs) do
+                if math.abs(x - loc[1]) + math.abs(y - loc[2]) < dist then return true end
+            end
+            return false
+        end
+
+        -- Try with spacing first, then relax if needed
+        for _, spacing in ipairs({{2, 3}, {1, 2}, {0, 0}}) do
+            local castle_dist, village_dist = spacing[1], spacing[2]
+            local fallback_attempts = 0
+            while placed < min_villages and fallback_attempts < 500 do
+                local vx = H.rand(3, width - 2)
+                local vy = H.rand(3, height - 2)
+                local t = tiles[vy][vx]
+                if not is_blocked(t)
+                    and (castle_dist == 0 or not near_castle(vx, vy, castle_dist))
+                    and (village_dist == 0 or not near_village(vx, vy, village_dist)) then
+                    tiles[vy][vx] = village_types[H.rand(1, #village_types)]
+                    placed = placed + 1
+                    table.insert(village_locs, {vx, vy})
+                    if vx <= mid then left_count = left_count + 1
+                    else right_count = right_count + 1 end
+                end
+                fallback_attempts = fallback_attempts + 1
+            end
+            if placed >= min_villages then break end
+        end
+
+        -- Last resort: sequential scan of every tile
+        if placed < min_villages then
+            for vy = 3, height - 2 do
+                for vx = 3, width - 2 do
+                    if placed >= min_villages then break end
+                    if not is_blocked(tiles[vy][vx]) then
+                        tiles[vy][vx] = village_types[H.rand(1, #village_types)]
+                        placed = placed + 1
+                        table.insert(village_locs, {vx, vy})
+                    end
+                end
+                if placed >= min_villages then break end
+            end
+        end
+    end
+
+    -- Contested center village (try a few spots to avoid adjacency)
+    for _ = 1, 10 do
+        local cy = H.rand(math.floor(height/2) - 1, math.floor(height/2) + 1)
+        local cx = H.rand(math.floor(width/2) - 2, math.floor(width/2) + 2)
+        if cx >= 1 and cx <= width and cy >= 1 and cy <= height then
+            local ok = true
+            for _, loc in ipairs(village_locs) do
+                if math.abs(cx - loc[1]) + math.abs(cy - loc[2]) <= 2 then ok = false; break end
+            end
+            if ok then
+                tiles[cy][cx] = village_types[H.rand(1, #village_types)]
+                break
+            end
+        end
     end
 end
 

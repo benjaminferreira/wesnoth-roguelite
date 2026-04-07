@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Aa")
 
 local trees = {"Aa^Fpa", "Aa^Fma", "Aa^Fda"}
@@ -37,7 +37,6 @@ for y = 1, HT do for x = 1, W do
 end end
 
 H.fill_pass(tiles, W, HT, "Aa", {"Ha", "Aa^Esa"}, 25)
-H.scatter_villages(tiles, W, HT, {"Aa^Vha", "Aa^Vca", "Aa^Vla", "Aa^Vaa"}, {"Aa", "Ha"}, 5)
 if H.rand(1,2) == 1 then H.scatter_specials(tiles, W, HT, {"Aa^Esa"}, {"Aa"}, H.rand(3, 6)) end
 H.dense_borders(tiles, W, HT, {"Ha", "Aa^Fpa", "Ms", "Ha"}, "Ms")
 
@@ -45,4 +44,5 @@ H.maybe_scatter_ruins(tiles, W, HT, {"Aa", "Ha"}, 25)
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Aa", {"Kea", "Kha"}, {"Cea", "Cha"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rra", "Aa")
 H.place_bridges(tiles, W, HT, path)
+H.scatter_villages(tiles, W, HT, {"Aa^Vha", "Aa^Vca", "Aa^Vla", "Aa^Vaa"}, {"Aa", "Ha"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

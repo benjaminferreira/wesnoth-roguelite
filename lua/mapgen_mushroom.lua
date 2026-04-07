@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Gg")
 
 -- Cave walls on top edge + one side halfway down
@@ -96,8 +96,8 @@ for _ = 1, H.rand(6, 10) do
     end
 end
 
-H.scatter_villages(tiles, W, HT, {"Gg^Vh", "Gg^Ve", "Uu^Vu"}, {"Gg", "Gd", "Uu"}, 5)
 
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Kh"}, {"Ce", "Ch"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Gd", "Gg")
+H.scatter_villages(tiles, W, HT, {"Gg^Vh", "Gg^Ve", "Uu^Vu"}, {"Gg", "Gd", "Uu"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

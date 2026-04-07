@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Gg")
 
 -- Swamp pools
@@ -41,11 +41,11 @@ for _ = 1, H.rand(3, 6) do
 end
 
 H.fill_pass(tiles, W, HT, "Gg", {"Ss", "Gd", "Gs", "Sm"}, 50)
-H.scatter_villages(tiles, W, HT, {"Ss^Vhs", "Gg^Vh", "Gg^Vc", "Ds^Vda"}, {"Gg", "Ss", "Gd", "Ds", "Sm"}, 6)
 H.dense_borders(tiles, W, HT, {"Ss", "Gs^Fp", "Sm", "Ww"}, "Ww")
 
 H.maybe_scatter_ruins(tiles, W, HT, {"Gg", "Gd", "Ss"}, 50)
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Khs"}, {"Ce", "Chs"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Gd")
 H.place_bridges(tiles, W, HT, path)
+H.scatter_villages(tiles, W, HT, {"Ss^Vhs", "Gg^Vh", "Gg^Vc", "Ds^Vda"}, {"Gg", "Ss", "Gd", "Ds", "Sm"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

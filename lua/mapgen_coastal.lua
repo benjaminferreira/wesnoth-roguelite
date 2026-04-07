@@ -1,5 +1,5 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Ww")
 
 -- Create distinct separate islands with gaps between them
@@ -61,7 +61,6 @@ end
 H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs"}, 30)
 
 -- Villages
-H.scatter_villages(tiles, W, HT, {"Gg^Vht", "Gg^Vh"}, {"Gg", "Ds"}, 4)
 for _ = 1, H.rand(1, 2) do
     local vx, vy = H.rand(10, W-9), H.rand(4, HT-3)
     if tiles[vy][vx] == "Ww" then tiles[vy][vx] = "Ww^Vm" end
@@ -203,4 +202,5 @@ while (x ~= p2x or y ~= p2y) and stuck < 500 do
     end
 end
 
+H.scatter_villages(tiles, W, HT, {"Gg^Vht", "Gg^Vh"}, {"Gg", "Ds"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

@@ -1,6 +1,6 @@
 local H = wesnoth.dofile("~add-ons/Wesnoth_Roguelite/lua/mapgen_helpers.lua")
 -- Lava cave: dark volcanic cavern with stone walls
-local W, HT = H.random_map_size()
+local W, HT, MAP_SIZE = H.random_map_size()
 local tiles = H.init_map(W, HT, "Ur")
 
 -- Stone wall border (ancient temple walls)
@@ -56,8 +56,8 @@ for y = 2, HT-1 do for x = 2, W-1 do
 end end
 
 H.scatter_specials(tiles, W, HT, {"Ur^Ebn", "Uu^Efs", "Urb^Ebn"}, {"Ur", "Urb", "Uu"}, H.rand(4, 7))
-H.scatter_villages(tiles, W, HT, {"Uu^Vu"}, {"Ur", "Uu", "Urb"}, 4)
 
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Ur", {"Kud", "Ke"}, {"Cud", "Ce"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Urb", "Ur")
+H.scatter_villages(tiles, W, HT, {"Uu^Vu"}, {"Ur", "Uu", "Urb"}, nil, MAP_SIZE)
 return H.build_map_string(tiles, W, HT, p1x, p1y, p2x, p2y)

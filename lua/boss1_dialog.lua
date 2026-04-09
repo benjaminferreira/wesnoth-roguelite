@@ -18,7 +18,7 @@ D.dialog = {
         },
         orc = {
             {"boss", "Orcs at my gate. How original."},
-            {"hero", "Open the gate or we open you. Your choice."},
+            {"hero", "Walls and gates. Humans always hide behind something. Tear it down, we go through."},
             {"boss", "...I admire the directness, at least."},
         },
         undead = {
@@ -48,7 +48,7 @@ D.dialog = {
         },
         orc = {
             {"boss", "Orcs. The forest will swallow you whole."},
-            {"hero", "We've eaten worse than trees. Let's go, boys."},
+            {"hero", "Forests burn and druids bleed same as anything else. Push forward, don't stop for the trees."},
         },
         undead = {
             {"boss", "You bring death into a place of life. The forest rejects you."},
@@ -66,29 +66,28 @@ D.dialog = {
     },
     maggash = {
         loyalist = {
-            {"boss", "WAAAGH! Humans! Get 'em, boys!"},
-            {"hero", "Form ranks! Hold the line!"},
+            {"boss", "There! Humans with gold on their backs! Take everything! CHARGE!"},
+            {"hero", "Shields up! Form ranks NOW!"},
         },
         elf = {
-            {"boss", "Pointy-ears! Hah! Snap 'em off!"},
-            {"hero", "Charming. Archers, ready."},
+            {"boss", "Elves on the road! Surround them before they scatter! GO!"},
+            {"hero", "Archers to the front! Loose on my mark!"},
         },
         orc = {
-            {"boss", "Another warchief? This land ain't big enough for two of us!"},
-            {"hero", "Agreed. One of us leaves. It won't be me."},
-            {"boss", "HAH! I like you! I'll kill you last!"},
+            {"narrator", "A war horn splits the air. The treeline erupts with goblins."},
+            {"hero", "Weapons out! Show them who owns this ground!"},
         },
         undead = {
-            {"boss", "Bones! Can't eat bones! Useless!"},
-            {"hero", "You won't need to eat where you're going."},
+            {"boss", "Goblins! Wolves! Tear them apart — dead or not, they'll break!"},
+            {"hero", "Hold formation. Let them crash against us."},
         },
         drake = {
-            {"boss", "Big lizards! The boys want dragon steaks tonight!"},
-            {"hero", "Your boys will be ash before dinner."},
+            {"narrator", "Wolf riders burst from the tall grass. Behind them, a wall of spears and a roaring warchief."},
+            {"hero", "Take to the sky! Burn the front line before they reach us!"},
         },
         knalgan = {
-            {"boss", "Short ones! And sneaky ones! CRUSH 'EM!"},
-            {"hero", "He's loud. Take out the loud one first."},
+            {"boss", "Dwarves and thieves! Swarm them! Don't let them dig in! MOVE!"},
+            {"hero", "Backs together! Don't let them flank us!"},
         },
     },
     pale_conductor = {
@@ -102,7 +101,7 @@ D.dialog = {
         },
         orc = {
             {"narrator", "The necromancer raises one hand. The earth splits. Bones emerge."},
-            {"hero", "Bah. Dead things. Hit 'em till they stop moving."},
+            {"hero", "Bones and corpses. Smash them back into the dirt where they belong."},
         },
         undead = {
             {"narrator", "The necromancer tilts his head, studying you. A rival. An anomaly."},
@@ -128,8 +127,8 @@ D.dialog = {
         },
         orc = {
             {"boss", "Orcs! You have spirit. I'll enjoy this."},
-            {"hero", "Less talking, more fighting. That's our way."},
-            {"boss", "Ha! A drake could learn to like you."},
+            {"hero", "Big words from a big lizard sitting on a rock. Come down and bleed with the rest of us."},
+            {"boss", "Ha! A drake could learn to respect that."},
         },
         undead = {
             {"boss", "The dead don't burn well. Disappointing."},
@@ -158,8 +157,8 @@ D.dialog = {
         },
         orc = {
             {"boss", "Orcs. Loud, clumsy, predictable."},
-            {"hero", "Predictable? We'll show you predictable."},
-            {"boss", "That's... exactly what I expected you to say."},
+            {"hero", "Five against a whole warband and they think they're tough. Spread out, drag them apart, finish them."},
+            {"boss", "...noted. Lads, stay sharp."},
         },
         undead = {
             {"boss", "The dead. Can't bribe the dead. Can't scare them either. Annoying."},

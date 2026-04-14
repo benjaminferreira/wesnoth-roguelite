@@ -53,6 +53,7 @@ H.maybe_fixture(tiles, W, HT, "bone_pile", 10)
 H.maybe_fixture(tiles, W, HT, "graveyard", 10)
 H.maybe_fixture(tiles, W, HT, "hill_fort", 15)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 10)
+H.maybe_fixture(tiles, W, HT, "water_lilies", 10)
 
 -- Fill
 H.fill_pass(tiles, W, HT, "Gg", grounds, 40)

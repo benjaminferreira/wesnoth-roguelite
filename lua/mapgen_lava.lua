@@ -51,12 +51,13 @@ if H.rand(1,100) <= 30 then
 end
 
 H.maybe_fixture(tiles, W, HT, "cave_chasm", 35)
-H.maybe_fixture(tiles, W, HT, "ancient_temple", 35)
 H.maybe_fixture(tiles, W, HT, "lava_vent", 45)
 H.maybe_fixture(tiles, W, HT, "brazier_circle", 30)
 H.maybe_fixture(tiles, W, HT, "bone_pile", 20)
 H.maybe_fixture(tiles, W, HT, "volcano", 15)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 15)
+H.maybe_fixture(tiles, W, HT, "ruins", 15)
+H.maybe_fixture(tiles, W, HT, "pit", 15)
 
 -- Floor variety
 for y = 2, HT-1 do for x = 2, W-1 do

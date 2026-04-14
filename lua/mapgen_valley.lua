@@ -57,6 +57,9 @@ H.maybe_fixture(tiles, W, HT, "stone_circle", 15)
 H.maybe_fixture(tiles, W, HT, "hill_fort", 15)
 H.maybe_fixture(tiles, W, HT, "water_lilies", 20)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 5)
+H.maybe_fixture(tiles, W, HT, "ruins", 15)
+H.maybe_fixture(tiles, W, HT, "farmland_patch", 15)
+H.maybe_fixture(tiles, W, HT, "mushroom_grove", 10)
 
 H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs", "Gll", "Gg^Efm"}, 40)
 

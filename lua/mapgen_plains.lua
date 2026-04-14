@@ -47,6 +47,8 @@ H.maybe_fixture(tiles, W, HT, "hill_fort", 20)
 H.maybe_fixture(tiles, W, HT, "desert_patch", 10)
 H.maybe_fixture(tiles, W, HT, "pond", 20)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 25)
+H.maybe_fixture(tiles, W, HT, "stream", 15)
+H.maybe_fixture(tiles, W, HT, "great_tree", 10)
 
 -- Scattered ruins variant (50% of plains maps)
 if H.rand(1, 2) == 1 then

@@ -24,6 +24,7 @@ H.maybe_fixture(tiles, W, HT, "stone_circle", 15)
 H.maybe_fixture(tiles, W, HT, "bone_pile", 15)
 H.maybe_fixture(tiles, W, HT, "signpost", 15)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 10)
+H.maybe_fixture(tiles, W, HT, "watchtower", 15)
 
 -- Frozen lake (50%)
 if H.rand(1,2) == 1 then H.place_cluster(tiles, W, HT, H.rand(10, W-10), H.rand(6, HT-6), "Ai", H.rand(2, 3)) end

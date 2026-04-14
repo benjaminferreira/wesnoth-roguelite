@@ -33,6 +33,10 @@ H.maybe_fixture(tiles, W, HT, "bone_pile", 20)
 H.maybe_fixture(tiles, W, HT, "mushroom_grove", 20)
 H.maybe_fixture(tiles, W, HT, "island", 15)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 10)
+H.maybe_fixture(tiles, W, HT, "fairy_ring", 10)
+H.maybe_fixture(tiles, W, HT, "pond", 15)
+H.maybe_fixture(tiles, W, HT, "forest_shrine", 10)
+H.maybe_fixture(tiles, W, HT, "stone_circle", 10)
 
 -- Water lilies
 for _ = 1, H.rand(3, 6) do

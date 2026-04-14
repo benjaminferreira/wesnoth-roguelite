@@ -69,21 +69,35 @@ for _ = 1, H.rand(5, 9) do
     if tiles[y][x] == "Gg" then tiles[y][x] = "Gg^Efm" end
 end
 
--- Scattered trees
-for _ = 1, H.rand(5, 9) do
+-- Scattered trees — denser, mixed types for grove feel
+for _ = 1, H.rand(8, 14) do
     local x, y = H.rand(5, W-4), H.rand(4, HT-3)
-    if tiles[y][x] == "Gg" then tiles[y][x] = "Gs^Fp" end
+    if tiles[y][x] == "Gg" or tiles[y][x] == "Gs" then
+        tiles[y][x] = ({"Gs^Fp", "Gg^Fms", "Gll^Fp", "Gg^Fds"})[H.rand(1,4)]
+    end
+end
+
+-- Small forest clusters (2-3 trees together)
+for _ = 1, H.rand(3, 5) do
+    local x, y = H.rand(6, W-5), H.rand(5, HT-4)
+    if tiles[y][x] == "Gg" or tiles[y][x] == "Gs" then
+        H.place_cluster(tiles, W, HT, x, y, ({"Gg^Fms", "Gll^Fp"})[H.rand(1,2)], 1)
+    end
 end
 
 H.maybe_fixture(tiles, W, HT, "cave_lake", 40)
 H.maybe_fixture(tiles, W, HT, "sunlit_clearing", 50)
 H.maybe_fixture(tiles, W, HT, "cave_spring", 25)
-H.maybe_fixture(tiles, W, HT, "fairy_ring", 40)
-H.maybe_fixture(tiles, W, HT, "pond", 30)
-H.maybe_fixture(tiles, W, HT, "great_tree", 30)
-H.maybe_fixture(tiles, W, HT, "flower_field", 35)
-H.maybe_fixture(tiles, W, HT, "forest_shrine", 20)
+H.maybe_fixture(tiles, W, HT, "fairy_ring", 50)
+H.maybe_fixture(tiles, W, HT, "pond", 45)
+H.maybe_fixture(tiles, W, HT, "great_tree", 35)
+H.maybe_fixture(tiles, W, HT, "flower_field", 40)
+H.maybe_fixture(tiles, W, HT, "forest_shrine", 30)
+H.maybe_fixture(tiles, W, HT, "ruins", 25)
+H.maybe_fixture(tiles, W, HT, "stone_circle", 20)
+H.maybe_fixture(tiles, W, HT, "water_lilies", 30)
 H.maybe_fixture(tiles, W, HT, "bone_pile", 10)
+H.maybe_fixture(tiles, W, HT, "ancient_temple", 15)
 
 H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs", "Gll"}, 30)
 

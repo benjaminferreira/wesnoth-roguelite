@@ -14,7 +14,7 @@ end
 H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs"}, 35)
 
 -- Path and road FIRST
-local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Kh"}, {"Ce", "Ch"})
+local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Kh", "Ket"}, {"Ce", "Ch"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rr")
 local rx = H.rand(math.floor(W/3), math.floor(2*W/3))
 for y2 = 1, HT do

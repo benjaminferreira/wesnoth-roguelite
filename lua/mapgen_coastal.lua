@@ -67,7 +67,7 @@ for _ = 1, H.rand(1, 2) do
 end
 
 -- Castles LAST
-local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Kh"}, {"Ce", "Ch"})
+local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Ke", "Kh", "Ket", "Ko"}, {"Ce", "Ch", "Co"})
 
 -- Ensure land around castles with beach transition
 for _, pos in ipairs({{p1x, p1y}, {p2x, p2y}}) do

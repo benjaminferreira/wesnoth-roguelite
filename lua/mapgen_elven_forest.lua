@@ -44,7 +44,7 @@ if H.rand(1,2) == 1 then H.scatter_specials(tiles, W, HT, {"Gg^Efm", "Gg^Em"}, {
 H.dense_borders(tiles, W, HT, {"Gg^Fds", "Gg^Fms", "Gg^Fet", "Hh"}, nil)
 
 -- Elven castles
-local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Kv", "Kv"}, {"Cv", "Cv"})
+local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg", {"Kv", "Kv", "Kvr"}, {"Cv", "Cv", "Cvr"})
 -- Overgrown cobble path (not a road — feels more natural)
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rp", "Gll")
 H.place_bridges(tiles, W, HT, path)

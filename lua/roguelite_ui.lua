@@ -215,4 +215,37 @@ function UI.text_input(cfg)
     return entered, 1
 end
 
+-- Multi-select: pick exactly N items from a list.
+function UI.multi_choose(cfg)
+    local title = cfg.title or ""
+    local message = cfg.message or ""
+    local options = cfg.options or {}
+    local count = cfg.count or 1
+    local selected = {}
+    local pool = {}
+    for i, o in ipairs(options) do
+        pool[#pool+1] = {idx=i, opt=o}
+    end
+    for pick = 1, count do
+        if #pool == 0 then break end
+        local opts = {}
+        for _, p in ipairs(pool) do
+            opts[#opts+1] = p.opt
+        end
+        local prompt = message
+        if count > 1 then
+            prompt = prompt .. "\n\n<i>Selection " .. pick .. " of " .. count .. "</i>"
+        end
+        local choice = UI.choose{
+            title=title,
+            message=prompt,
+            options=opts,
+        }
+        selected[#selected+1] = pool[choice].idx
+        table.remove(pool, choice)
+    end
+    return selected
+end
+
 return UI
+

@@ -31,8 +31,8 @@ end end
 H.fill_pass(tiles, W, HT, "Dd", {"Ds", "Hd", "Dd^Edp", "Dd^Esd"}, 35)
 H.dense_borders(tiles, W, HT, {"Hd", "Dd", "Mdd", "Hd"}, "Mdd")
 
-H.maybe_scatter_ruins(tiles, W, HT, {"Dd", "Ds"}, 25)
-local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Dd", {"Kd", "Ke"}, {"Cd", "Ce"})
+H.maybe_scatter_ruins(tiles, W, HT, {"Dd", "Ds"}, 25, {"Chw", "Chs"})
+local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Dd", {"Kd", "Ke", "Kdr"}, {"Cd", "Ce", "Cdr"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rd", "Ds")
 H.place_bridges(tiles, W, HT, path)
 H.scatter_villages(tiles, W, HT, {"Dd^Vda", "Dd^Vdt", "Ds^Vdt"}, {"Dd", "Ds", "Hd"}, nil, MAP_SIZE)

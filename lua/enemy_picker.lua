@@ -333,8 +333,8 @@ end
 
 --- Calculate enemy starting gold based on battle number
 function EP.enemy_gold(battle_number, is_boss)
-    local base = 80
-    local per_battle = 15
+    local base = 100
+    local per_battle = 20
     local gold = base + (battle_number - 1) * per_battle
     if is_boss then gold = gold + 80 end
     return gold

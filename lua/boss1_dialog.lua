@@ -71,7 +71,7 @@ D.dialog = {
         },
         elf = {
             {"boss", "Elves on the road! Surround them before they scatter! GO!"},
-            {"hero", "Archers to the front! Loose on my mark!"},
+            {"hero", "Archers to the ready! Loose on my mark!"},
         },
         orc = {
             {"narrator", "A war horn splits the air. The treeline erupts with goblins."},

@@ -14,6 +14,24 @@ function H.rand(min, max)
     return wesnoth.random(min, max)
 end
 
+-- Pick a position on [lo..hi] biased away from ref using distance^2 weighting.
+-- ~85% of the time picks the far half, ~15% close — keeps variety.
+function H.weighted_far_pos(ref, lo, hi)
+    local total = 0
+    local entries = {}
+    for pos = lo, hi do
+        local dist = math.abs(pos - ref)
+        local w = dist * dist + 1  -- +1 so same-position still has tiny chance
+        total = total + w
+        table.insert(entries, {pos = pos, cumulative = total})
+    end
+    local roll = wesnoth.random(1, total)
+    for _, e in ipairs(entries) do
+        if roll <= e.cumulative then return e.pos end
+    end
+    return entries[#entries].pos
+end
+
 -- Check if a tile is a village (never overwrite villages)
 function H.is_village(terrain)
     return terrain and terrain:find("%^V") ~= nil
@@ -24,25 +42,27 @@ end
 function H.random_map_size()
     -- Map sizes by category
     local small = {
-        {28, 22},  -- compact
-        {30, 22},  -- compact wide
-        {28, 24},  -- compact tall
-        {30, 24},  -- small balanced
-    }
-    local medium = {
         {32, 24},  -- balanced
         {34, 22},  -- wide standard
         {30, 26},  -- tall-ish
         {32, 22},  -- medium wide
         {28, 28},  -- square
     }
-    local large = {
+    local medium = {
         {34, 24},  -- large
         {36, 24},  -- large wide
         {34, 26},  -- large tall
         {38, 24},  -- extra wide
         {36, 26},  -- extra large
         {32, 30},  -- tall large
+    }
+    local large = {
+        {40, 26},  -- wide sprawl
+        {38, 28},  -- balanced sprawl
+        {42, 26},  -- extra wide sprawl
+        {40, 28},  -- grand
+        {36, 32},  -- tall grand
+        {44, 28},  -- massive wide
     }
 
     -- Battle number determines size weighting
@@ -76,8 +96,8 @@ function H.random_map_size()
 
     local pick = pool[H.rand(1, #pool)]
     local area = pick[1] * pick[2]
-    -- small < 700 tiles, large >= 800
-    local size_category = area < 700 and "small" or (area >= 800 and "large" or "medium")
+    -- small < 800 tiles, large >= 950
+    local size_category = area < 800 and "small" or (area >= 950 and "large" or "medium")
     return pick[1], pick[2], size_category
 end
 
@@ -655,10 +675,19 @@ function H.place_bridges(tiles, width, height, path)
 end
 
 -- Scatter single castle/ruin tiles across the map
-function H.maybe_scatter_ruins(tiles, width, height, valid_terrains, chance)
+function H.maybe_scatter_ruins(tiles, width, height, valid_terrains, chance, exclude)
     chance = chance or 25
     if H.rand(1, 100) > chance then return end
-    local ruin_types = {"Cer", "Chr", "Cdr", "Chw", "Chs", "Cvr", "Ch", "Ce"}
+    local ruin_types = {"Cer", "Chr", "Cdr", "Chw", "Chs", "Cvr", "Ch", "Ce", "Co", "Cf", "Cfr", "Cte"}
+    if exclude then
+        local ex_set = {}
+        for _, e in ipairs(exclude) do ex_set[e] = true end
+        local filtered = {}
+        for _, r in ipairs(ruin_types) do
+            if not ex_set[r] then table.insert(filtered, r) end
+        end
+        ruin_types = filtered
+    end
     for _ = 1, H.rand(2, 7) do
         local rx, ry = H.rand(3, width - 2), H.rand(3, height - 2)
         local t = tiles[ry][rx]
@@ -696,13 +725,13 @@ function H.place_castles(tiles, width, height, base, keep_types, castle_types, v
     if vertical then
         p1x = H.rand(5, width - 4)
         p1y = 4
-        p2x = H.rand(5, width - 4)
+        p2x = H.weighted_far_pos(p1x, 5, width - 4)
         p2y = height - 3
     else
         p1x = 4
         p1y = H.rand(5, height - 4)
         p2x = width - 3
-        p2y = H.rand(5, height - 4)
+        p2y = H.weighted_far_pos(p1y, 5, height - 4)
     end
 
     local keep1 = keep_types[H.rand(1, #keep_types)]
@@ -711,8 +740,16 @@ function H.place_castles(tiles, width, height, base, keep_types, castle_types, v
     local castle2 = castle_types[H.rand(1, #castle_types)]
 
     -- 15% chance each side gets a ruined castle variant
-    if H.rand(1, 100) <= 15 then keep1 = "Khr"; castle1 = "Chr" end
-    if H.rand(1, 100) <= 15 then keep2 = "Khr"; castle2 = "Chr" end
+    local ruin_k = {"Khr", "Ker", "Kdr", "Kvr", "Kfr"}
+    local ruin_c = {"Chr", "Cer", "Cdr", "Cvr", "Cfr"}
+    if H.rand(1, 100) <= 15 then
+        local ri = H.rand(1, #ruin_k)
+        keep1 = ruin_k[ri]; castle1 = ruin_c[ri]
+    end
+    if H.rand(1, 100) <= 15 then
+        local ri = H.rand(1, #ruin_k)
+        keep2 = ruin_k[ri]; castle2 = ruin_c[ri]
+    end
 
     -- Clear safe zones (skip water and bridges)
     for _, pos in ipairs({{p1x, p1y}, {p2x, p2y}}) do
@@ -1033,49 +1070,51 @@ function H.maybe_fixture(tiles, width, height, name, chance)
         end
 
     elseif name == "ruins" then
+        local ruin_castles = {"Chr", "Cer", "Cdr", "Cvr", "Cfr"}
+        local ruin_keeps = {"Khr", "Ker", "Kdr", "Kvr", "Kfr"}
+        local function rcastle() return ruin_castles[H.rand(1, #ruin_castles)] end
+        local function rkeep() return ruin_keeps[H.rand(1, #ruin_keeps)] end
+
         local size = H.rand(1, 3)
         if size == 1 then
-            -- Small: 2-3 scattered ruin tiles with dirt between
-            tiles[fy][fx] = "Chr"
+            tiles[fy][fx] = rcastle()
             for _ = 1, H.rand(1, 2) do
                 local nx, ny = H.hex_step(fx, fy, H.rand(1, 6))
                 if nx >= 1 and nx <= width and ny >= 1 and ny <= height then
-                    tiles[ny][nx] = "Cer"
+                    tiles[ny][nx] = rcastle()
                 end
             end
         elseif size == 2 then
-            -- Medium: keep ruin + 2-3 scattered castle tiles with road/dirt gaps
-            tiles[fy][fx] = "Khr"
+            tiles[fy][fx] = rkeep()
             local placed = 0
             for _ = 1, 8 do
                 if placed >= 3 then break end
                 local dir = H.rand(1, 6)
                 local nx, ny = H.hex_step(fx, fy, dir)
-                -- Sometimes skip one hex for a gap
                 if H.rand(1, 2) == 1 then nx, ny = H.hex_step(nx, ny, dir) end
                 if nx >= 2 and nx <= width-1 and ny >= 2 and ny <= height-1 then
-                    if tiles[ny][nx] ~= "Khr" and tiles[ny][nx] ~= "Chr" then
-                        tiles[ny][nx] = (H.rand(1,2)==1) and "Chr" or "Cer"
+                    local t = tiles[ny][nx]
+                    if t:sub(1,1) ~= "K" and t:sub(1,1) ~= "C" then
+                        tiles[ny][nx] = rcastle()
                         placed = placed + 1
                     end
                 end
             end
-            -- Dirt/road between pieces
             H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
-                if tiles[ny][nx] ~= "Khr" and tiles[ny][nx] ~= "Chr" and tiles[ny][nx] ~= "Cer" then
+                local t = tiles[ny][nx]
+                if t:sub(1,1) ~= "K" and t:sub(1,1) ~= "C" then
                     if H.rand(1,100) > 60 then tiles[ny][nx] = "Gd" end
                 end
             end)
         else
-            -- Large: scattered ruin tiles in a loose area, connected by dirt
-            tiles[fy][fx] = "Khr"
+            tiles[fy][fx] = rkeep()
             local cx, cy = fx, fy
             for _ = 1, H.rand(4, 6) do
                 local dir = H.rand(1, 6)
                 cx, cy = H.hex_step(cx, cy, dir)
                 if cx >= 2 and cx <= width-1 and cy >= 2 and cy <= height-1 then
                     local r = H.rand(1, 100)
-                    if r > 50 then tiles[cy][cx] = (H.rand(1,2)==1) and "Chr" or "Cer"
+                    if r > 50 then tiles[cy][cx] = rcastle()
                     elseif r > 20 then tiles[cy][cx] = "Gd"
                     end
                 end
@@ -1087,7 +1126,7 @@ function H.maybe_fixture(tiles, width, height, name, chance)
             if sx>=1 and sx<=width and sy>=1 and sy<=height then
                 local t = tiles[sy][sx]
                 if t:sub(1,1) ~= "K" and t:sub(1,1) ~= "C" and t ~= "Ww" and t ~= "Xu" then
-                    tiles[sy][sx] = "Cer"
+                    tiles[sy][sx] = rcastle()
                 end
             end
         end
@@ -1348,8 +1387,10 @@ function H.maybe_fixture(tiles, width, height, name, chance)
         end)
         for _ = 1, H.rand(3, 5) do
             if cx >= 2 and cx <= width-1 and cy >= 2 and cy <= height-1 then
-                tiles[cy][cx] = H.rand(1,3) == 1 and "Mdd" or hill
+                tiles[cy][cx] = H.rand(1,3) <= 2 and "Mdd" or hill
             end
+            -- Snake: shift direction by -1, 0, or +1 each step
+            dir = ((dir - 1 + H.rand(-1, 1)) % 6) + 1
             cx, cy = H.hex_step(cx, cy, dir)
         end
 

@@ -72,7 +72,7 @@ H.dense_borders(tiles, W, HT, btrees, H.rand(1,3)==1 and "Mm" or nil)
 -- Castles LAST
 H.maybe_scatter_ruins(tiles, W, HT, {"Gg", "Gd", "Gs"}, 25)
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Gg",
-    {"Ke", "Kh"}, {"Ce", "Ch", "Chr"})
+    {"Ke", "Kh", "Kv", "Ko"}, {"Ce", "Ch", "Cv", "Co", "Chr"})
 
 -- Path + bridges
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rr")

@@ -93,8 +93,8 @@ H.scatter_specials(tiles, W, HT,
 
 -- Castles LAST
 local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Uu",
-    {"Kud", "Ke"},
-    {"Cud", "Ce"}, narrow)
+    {"Kud", "Ke", "Kf"},
+    {"Cud", "Ce", "Cf"}, narrow)
 
 -- Path (mostly cosmetic since cave is already open)
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Ur", "Uu")

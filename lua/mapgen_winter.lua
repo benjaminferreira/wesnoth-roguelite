@@ -40,8 +40,8 @@ H.fill_pass(tiles, W, HT, "Aa", {"Ha", "Aa^Esa"}, 25)
 if H.rand(1,2) == 1 then H.scatter_specials(tiles, W, HT, {"Aa^Esa"}, {"Aa"}, H.rand(3, 6)) end
 H.dense_borders(tiles, W, HT, {"Ha", "Aa^Fpa", "Ms", "Ha"}, "Ms")
 
-H.maybe_scatter_ruins(tiles, W, HT, {"Aa", "Ha"}, 25)
-local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Aa", {"Kea", "Kha"}, {"Cea", "Cha"})
+H.maybe_scatter_ruins(tiles, W, HT, {"Aa", "Ha"}, 25, {"Chw", "Chs"})
+local p1x, p1y, p2x, p2y = H.place_castles(tiles, W, HT, "Aa", {"Kea", "Kha", "Koa", "Kva", "Kfa"}, {"Cea", "Cha", "Coa", "Cva", "Cfa"})
 local path = H.carve_path(tiles, W, HT, p1x, p1y, p2x, p2y, "Rra", "Aa")
 H.place_bridges(tiles, W, HT, path)
 H.scatter_villages(tiles, W, HT, {"Aa^Vha", "Aa^Vca", "Aa^Vla", "Aa^Vaa"}, {"Aa", "Ha"}, nil, MAP_SIZE)

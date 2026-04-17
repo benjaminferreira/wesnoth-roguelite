@@ -63,10 +63,11 @@ H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs"}, 30)
 -- Island fixtures
 H.maybe_fixture(tiles, W, HT, "ruins", 20)
 H.maybe_fixture(tiles, W, HT, "campfire", 15)
-H.maybe_fixture(tiles, W, HT, "signpost", 15)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 15)
 H.maybe_fixture(tiles, W, HT, "bone_pile", 10)
 H.maybe_fixture(tiles, W, HT, "watchtower", 15)
+H.maybe_fixture(tiles, W, HT, "shell_beach", 25)
+H.maybe_fixture(tiles, W, HT, "rainforest_thicket", 15)
 
 -- Villages
 for _ = 1, H.rand(1, 2) do

@@ -153,7 +153,7 @@ function BM.pale_conductor()
     -- Ruins/gravestones
     for _ = 1, H.rand(3, 5) do
         local x, y = H.rand(12, W-5), H.rand(3, HT-2)
-        if not H.is_village(tiles[y][x]) then tiles[y][x] = "Gd^Edt" end
+        if not H.is_village(tiles[y][x]) then tiles[y][x] = "Gd^Es" end
     end
 
     -- Blend water edges

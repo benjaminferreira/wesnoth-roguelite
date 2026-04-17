@@ -87,6 +87,9 @@ H.maybe_fixture(tiles, W, HT, "pit", 15)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 10)
 H.maybe_fixture(tiles, W, HT, "pond", 15)
 H.maybe_fixture(tiles, W, HT, "water_lilies", 10)
+H.maybe_fixture(tiles, W, HT, "abandoned_mine", 20)
+H.maybe_fixture(tiles, W, HT, "flagstone_plaza", 15)
+H.maybe_fixture(tiles, W, HT, "mycelium_patch", 15)
 
 -- Light sources
 H.scatter_specials(tiles, W, HT,

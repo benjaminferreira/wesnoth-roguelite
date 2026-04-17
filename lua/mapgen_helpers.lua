@@ -989,7 +989,7 @@ function H.maybe_fixture(tiles, width, height, name, chance)
     -- Pick a random spot — margin depends on fixture type
     local edge_ok = {farmland_patch=true, flower_field=true, dead_grove=true,
         bone_pile=true, desert_bones=true, snow_drift=true, rocky_ridge=true,
-        swamp_patch=true, pond=true}
+        swamp_patch=true, pond=true, shell_beach=true}
     local fx, fy
     if edge_ok[name] then
         fx = H.rand(2, width - 1)
@@ -1203,7 +1203,7 @@ function H.maybe_fixture(tiles, width, height, name, chance)
         for _, off in ipairs(nbrs) do
             local nx, ny = fx + off[1], fy + off[2]
             if nx >= 1 and nx <= width and ny >= 1 and ny <= height then
-                if H.rand(1, 100) > 25 then tiles[ny][nx] = "Gd^Edt" end
+                if H.rand(1, 100) > 25 then tiles[ny][nx] = "Gd^Es" end
             end
         end
         tiles[fy][fx] = "Gd^Ecf"
@@ -1212,16 +1212,6 @@ function H.maybe_fixture(tiles, width, height, name, chance)
         tiles[fy][fx] = "Hh^Vhh"
         H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
             if H.rand(1, 100) > 50 then tiles[ny][nx] = "Hh" end
-        end)
-
-    elseif name == "graveyard" then
-        -- Tombstones and dead trees
-        tiles[fy][fx] = "Gd^Es"
-        H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
-            local r = H.rand(1, 100)
-            if r > 70 then tiles[ny][nx] = "Gd^Es"
-            elseif r > 50 then tiles[ny][nx] = "Gd"
-            end
         end)
 
     elseif name == "ancient_temple" then
@@ -1307,11 +1297,6 @@ function H.maybe_fixture(tiles, width, height, name, chance)
         else tiles[fy][fx] = "Dd^Ftd"
         end
 
-    elseif name == "signpost" then
-        tiles[fy][fx] = "Rr^Es"
-        local nx, ny = H.hex_step(fx, fy, H.rand(1,6))
-        if nx >= 1 and nx <= width and ny >= 1 and ny <= height then tiles[ny][nx] = "Rr" end
-
     elseif name == "flower_field" then
         tiles[fy][fx] = "Gg^Efm"
         H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
@@ -1319,11 +1304,11 @@ function H.maybe_fixture(tiles, width, height, name, chance)
         end)
 
     elseif name == "dead_grove" then
-        tiles[fy][fx] = "Gd^Edt"
+        tiles[fy][fx] = "Gd^Fdw"
         H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
             local r2 = H.rand(1,100)
-            if r2 > 60 then tiles[ny][nx] = "Gd^Edt"
-            elseif r2 > 40 then tiles[ny][nx] = "Gd^Edb" end
+            if r2 > 60 then tiles[ny][nx] = "Gd^Fdw"
+            elseif r2 > 40 then tiles[ny][nx] = "Gd" end
         end)
 
     elseif name == "windmill" then
@@ -1401,7 +1386,7 @@ function H.maybe_fixture(tiles, width, height, name, chance)
         end)
 
     elseif name == "forest_shrine" then
-        tiles[fy][fx] = "Gg^Edt"
+        tiles[fy][fx] = "Gg^Es"
         H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
             local r2 = H.rand(1,100)
             if r2 > 60 then tiles[ny][nx] = "Gs^Fp"
@@ -1430,6 +1415,62 @@ function H.maybe_fixture(tiles, width, height, name, chance)
             end
         end
         tiles[fy][fx] = "Ur^Ecf"
+
+    elseif name == "abandoned_mine" then
+        -- Short mine rail track with mine wall nearby
+        local dir = H.rand(1, 3) -- 1=vertical |, 2=ne-sw /, 3=se-nw \
+        local rail = dir == 1 and "^Br|" or (dir == 2 and "^Br/" or "^Br\\")
+        tiles[fy][fx] = "Ur" .. rail
+        local len = H.rand(3, 5)
+        local rx, ry = fx, fy
+        for _ = 1, len do
+            local nrx, nry = H.hex_step(rx, ry, dir == 1 and 4 or (dir == 2 and 5 or 3))
+            if nrx >= 2 and nrx <= width-1 and nry >= 2 and nry <= height-1 then
+                tiles[nry][nrx] = "Ur" .. rail
+                rx, ry = nrx, nry
+            else break end
+        end
+        -- Mine wall next to start
+        H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
+            if tiles[ny][nx] ~= "Ur" .. rail and H.rand(1,100) > 70 then tiles[ny][nx] = "Xuc" end
+        end)
+
+    elseif name == "shell_beach" then
+        H.place_cluster(tiles, width, height, fx, fy, "Ds^Ewsh", 1)
+        H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
+            if H.rand(1,100) > 60 then tiles[ny][nx] = "Ds" end
+        end)
+
+    elseif name == "mycelium_patch" then
+        tiles[fy][fx] = "Tb^Tfi"
+        H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
+            local r = H.rand(1,100)
+            if r > 60 then tiles[ny][nx] = "Tb^Tf"
+            elseif r > 40 then tiles[ny][nx] = "Tb" end
+        end)
+
+    elseif name == "flagstone_plaza" then
+        H.place_cluster(tiles, width, height, fx, fy, "Urb", 1)
+        -- Braziers on edges
+        H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
+            if tiles[ny][nx] == "Urb" and H.rand(1,100) > 60 then tiles[ny][nx] = "Urb^Ebn" end
+        end)
+
+    elseif name == "rainforest_thicket" then
+        tiles[fy][fx] = "Gg^Ftr"
+        H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
+            local r = H.rand(1,100)
+            if r > 50 then tiles[ny][nx] = "Gg^Ftp"
+            elseif r > 30 then tiles[ny][nx] = "Gg^Ftr" end
+        end)
+
+    elseif name == "bluff_overlook" then
+        tiles[fy][fx] = "Hh^Qhh"
+        H.for_each_neighbor(fx, fy, width, height, function(nx, ny)
+            local r = H.rand(1,100)
+            if r > 60 then tiles[ny][nx] = "Hh^Qhh"
+            elseif r > 40 then tiles[ny][nx] = "Hh" end
+        end)
     end
 end
 

@@ -96,8 +96,10 @@ H.maybe_fixture(tiles, W, HT, "forest_shrine", 30)
 H.maybe_fixture(tiles, W, HT, "ruins", 25)
 H.maybe_fixture(tiles, W, HT, "stone_circle", 20)
 H.maybe_fixture(tiles, W, HT, "water_lilies", 30)
-H.maybe_fixture(tiles, W, HT, "bone_pile", 10)
 H.maybe_fixture(tiles, W, HT, "ancient_temple", 15)
+H.maybe_fixture(tiles, W, HT, "mycelium_patch", 25)
+H.maybe_fixture(tiles, W, HT, "abandoned_mine", 15)
+H.maybe_fixture(tiles, W, HT, "flagstone_plaza", 15)
 
 H.fill_pass(tiles, W, HT, "Gg", {"Gd", "Gs", "Gll"}, 30)
 

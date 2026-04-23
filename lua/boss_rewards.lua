@@ -426,7 +426,8 @@ function BR.apply(reward_id, units, reward)
                 T.effect{apply_to="new_ability",
                     T.abilities{T.leadership{id="leadership", name="leadership",
                         description="Adjacent units of lower level will do more damage in combat.",
-                        value=25, cumulative="no", affect_self="no"}}}})
+                        value="(25 * (level - other.level))", cumulative="no", affect_self="no",
+                        T.affect_adjacent{T.filter{formula="level < other.level"}}}}}})
         end
     elseif reward_id == "skirmisher_training" then
         for _, u in ipairs(units) do

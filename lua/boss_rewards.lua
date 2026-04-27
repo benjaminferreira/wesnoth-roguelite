@@ -2,126 +2,109 @@
 local T = wml.tag
 local BR = {}
 
--- Reward pools organized by tier and category
--- Categories: recruit (unlock/champion), weapon (caches/weapon traits), stat (buffs/abilities)
--- Each tier picks 1 from each category = 3 choices always
+-- Reward pools: composition (slot 1) + amplifier (slots 2-3, merged build amp + strategic)
+-- Pick logic: 1 composition, 2 from amplifier pool. One amplifier slot has 50% boss override.
 BR.rewards = {
     [1] = {
-        recruit = {
+        composition = {
             {id="unlock_l2", flavor="Word of your conquest has reached experienced fighters. New soldiers offer their services.",
                 label="Unlock Level 2 Recruit", description="A new L2 unit type is added to your recruit list.",
-                image="icons/scroll_red.png", target="auto", pre_reveal=true, confirm="New recruit unlocked"},
-            {id="veterans_boon", flavor="Stories of victory spread through camp. Every soldier stands a little taller.",
-                label="Veteran's Boon", description="All units on your recall list gain 25% bonus XP.",
-                image="icons/book.png", target="auto", confirm="All recall units gained bonus XP"},
+                image="icons/amla-default.png", target="auto", pre_reveal=true, confirm="New recruit unlocked"},
             {id="loyal_champion_l2", flavor="A seasoned fighter pledges their blade to your cause. They ask for no pay — only a place in your ranks.",
                 label="Loyal Champion", description="A loyal L2 unit joins your warband (no upkeep, auto-deploys).",
                 image="icons/breastplate2.png", target="auto", pre_reveal=true, confirm="has joined your warband as a loyal champion"},
+            {id="veterans_boon", flavor="Stories of victory spread through camp. Every soldier stands a little taller.",
+                label="Veteran's Boon", description="All units on your recall list gain 25% bonus XP.",
+                image="icons/helmet_shiny.png", target="auto", confirm="All recall units gained bonus XP"},
         },
-        weapon = {
-            {id="weapon_spears", flavor="Salvaged spears from the conquered stronghold. Long reach, sharp tips, and the advantage of striking first.",
-                label="Weapon Cache — Spears", description="Choose 3 units to equip with a spear (7×3 pierce melee, firststrike).",
-                image="attacks/spear.png", target="pick", pick_count=3, confirm="equipped with spears"},
-            {id="weapon_bows", flavor="A crate of shortbows from the armory. Now your front line can fight back at range.",
-                label="Weapon Cache — Bows", description="Choose 3 units to equip with a shortbow (5×3 pierce ranged).",
-                image="attacks/bow.png", target="pick", pick_count=3, confirm="equipped with shortbows"},
-            {id="weapon_knives", flavor="Balanced throwing knives — they always find their mark, no matter the distance.",
-                label="Weapon Cache — Throwing Knives", description="Choose 3 units to equip with throwing knives (4×3 blade ranged, marksman).",
-                image="attacks/dagger-thrown-human.png", target="pick", pick_count=3, confirm="equipped with throwing knives"},
-            {id="weapon_maces", flavor="Crude but effective. Armor means nothing when the bones break underneath.",
-                label="Weapon Cache — Maces", description="Choose 3 units to equip with a mace (8×2 impact melee).",
-                image="attacks/mace.png", target="pick", pick_count=3, confirm="equipped with maces"},
-            {id="weapon_daggers", flavor="Short blades for close work. Deadly when the enemy isn't looking.",
-                label="Weapon Cache — Daggers", description="Choose 3 units to equip with a dagger (4×3 blade melee, backstab).",
-                image="attacks/dagger-human.png", target="pick", pick_count=3, confirm="equipped with daggers"},
-            {id="weapon_torches", flavor="Pitch-soaked torches. They burn hot and leave a mark.",
-                label="Weapon Cache — Torches", description="Choose 3 units to equip with a torch (6×2 fire melee).",
-                image="attacks/torch.png", target="pick", pick_count=3, confirm="equipped with torches"},
-            {id="weapon_slings", flavor="Simple slings and smooth stones. What they lack in elegance, they make up in bruises.",
-                label="Weapon Cache — Slings", description="Choose 3 units to equip with a sling (6×2 impact ranged).",
-                image="attacks/sling.png", target="pick", pick_count=3, confirm="equipped with slings"},
-        },
-        stat = {
-            {id="ironblood", flavor="Hard marching and harder fighting. Your troops are tougher than they were.",
-                label="Ironblood", description="Choose 4 units. Each gains +6 max HP.",
-                image="icons/potion_red_medium.png", target="pick", pick_count=4, confirm="received Ironblood"},
-            {id="battle_drills", flavor="Hours of sparring in camp. Your troops read attacks before they land.",
-                label="Battle Drills", description="Choose 4 units. Each gains +10% defense on all terrain.",
-                image="icons/shield_wooden.png", target="pick", pick_count=4, confirm="received battle drills"},
-            {id="fearless_training", flavor="Fear is a choice. Your soldiers have learned to refuse it.",
-                label="Fearless Training", description="Choose 4 units. Grants Fearless (no Time of Day penalty).",
-                image="icons/helmet_frogmouth.png", target="pick", pick_count=4, confirm="received fearless training"},
-            {id="feeding_training", flavor="The battlefield teaches its own lessons. Every kill makes them hungrier.",
-                label="Feeding Training", description="Choose 3 units. Grants Feeding (+1 max HP per kill).",
-                image="attacks/fangs.png", target="pick", pick_count=3, confirm="received feeding training"},
-            {id="leadership_training", flavor="You promote veterans to field officers. Nearby troops fight harder under their command.",
-                label="Leadership Training", description="Choose 2 units. Grants Leadership (+25% damage to adjacent allies).",
-                image="icons/ring_gold.png", target="pick", pick_count=2, confirm="promoted to field officer"},
-            {id="ambush_training", flavor="Your scouts teach the art of disappearing into the trees.",
-                label="Ambush Training", description="Choose 3 units. Grants Ambush (hide in forest).",
-                image="icons/cloak_leather_brown.png", target="pick", pick_count=3, confirm="received ambush training"},
+        amplifier = {
+            {id="virulent_strain", flavor="Your alchemists study the battlefield dead. The poison can be made stronger — much stronger.",
+                label="Virulent Strain", description="Poison now deals 12 damage per turn instead of 8.",
+                image="icons/potion_green_small.png", target="auto", confirm="Poison damage increased to 12/turn"},
+            {id="cutthroat_doctrine", flavor="Your assassins have learned to exploit every opening. A blade in the back hits harder than ever.",
+                label="Cutthroat Doctrine", description="Backstab now deals triple damage instead of double.",
+                image="attacks/dagger-human.png", target="auto", confirm="Backstab damage tripled"},
+            {id="arcane_mastery", flavor="Your mages push the boundaries of what's possible. Their spells find their mark with uncanny precision.",
+                label="Arcane Mastery", description="Magical attacks now have 85% chance to hit instead of 70%.",
+                image="icons/book.png", target="auto", confirm="Magical accuracy increased to 85%"},
+            {id="steady_aim", flavor="Hours of target practice pay off. Every arrow flies truer, every bolt hits harder.",
+                label="Steady Aim", description="All pierce ranged attacks gain +1 damage per strike.",
+                image="attacks/bow-short.png", target="auto", confirm="Pierce ranged damage increased"},
+            {id="blood_harvest", flavor="The battlefield teaches its own lessons. Every kill feeds the hunger.",
+                label="Blood Harvest", description="Choose 3 units to gain Feeding. All Feeding units gain +2 HP per kill instead of +1.",
+                image="attacks/fangs.png", target="pick", pick_count=3, confirm="received Blood Harvest"},
+            {id="thundering_charge", flavor="Your cavalry trains for the decisive charge. Hooves thunder, lances lower, the line breaks.",
+                label="Thundering Charge", description="All mounted units gain +1 movement and Charge on melee.",
+                image="attacks/lance.png", target="auto", confirm="Mounted units gained Charge and +1 movement"},
+            {id="drakefire_doctrine", flavor="Your troops learn to harness fire. Every flame burns hotter, every ember bites deeper.",
+                label="Drakefire Doctrine", description="All fire attacks (melee + ranged) deal +2 damage per strike.",
+                image="attacks/fire-breath-drake.png", target="auto", confirm="Fire damage increased by +2 per strike"},
+            {id="shatterpoint", flavor="Your warriors learn to read the fractures in armor and bone. One more swing is all it takes.",
+                label="Shatterpoint", description="All impact melee attacks gain +1 extra strike.",
+                image="attacks/hammer-dwarven.png", target="auto", confirm="Impact melee attacks gained +1 strike"},
+            {id="frostbite", flavor="The cold seeps deeper now. Every frozen strike leaves the enemy sluggish and slow.",
+                label="Frostbite", description="All cold attacks also Slow the target.",
+                image="attacks/iceball.png", target="auto", confirm="Cold attacks now slow targets"},
+            {id="spear_wall", flavor="Your spearmen drill until the formation is second nature. The first strike hits like a battering ram.",
+                label="Spear Wall", description="All firststrike melee attacks gain +2 damage per strike.",
+                image="attacks/pike.png", target="auto", confirm="Firststrike damage increased by +2 per strike"},
+            {id="double_loot", flavor="Your scouts learn to read the battlefield for hidden caches. Twice the salvage, twice the opportunity.",
+                label="Scavenger's Instinct", description="2 loot chests spawn per battle for the rest of the run.",
+                image="icons/key_silver.png", target="auto", confirm="Double loot enabled for the rest of the run"},
         },
     },
     [2] = {
-        recruit = {
+        composition = {
             {id="unlock_l3", flavor="Your reputation precedes you. Elite warriors seek you out.",
                 label="Unlock Level 3 Recruit", description="A new L3 unit type is added to your recruit list.",
-                image="icons/scroll_red.png", target="auto", pre_reveal=true, confirm="New recruit unlocked"},
+                image="icons/amla-default.png", target="auto", pre_reveal=true, confirm="New recruit unlocked"},
             {id="loyal_champion", flavor="A veteran of a hundred battles pledges their sword to your cause. They fight for loyalty, not coin.",
                 label="Loyal Champion", description="A powerful loyal L3 unit joins your warband (no upkeep, auto-deploys).",
                 image="icons/breastplate2.png", target="auto", pre_reveal=true, confirm="has joined your warband as a loyal champion"},
+            {id="legendary_hero", flavor="The battles have forged you into something more. Your presence alone turns the tide.",
+                label="Legendary Hero", description="Your leader gains Regenerates + Leadership + Fearless.",
+                image="icons/circlet_winged.png", target="auto", confirm="Your leader has become legendary"},
         },
-        weapon = {
-            {id="weapon_axes", flavor="Heavy axes forged for war. One swing can cleave through shield and bone alike.",
-                label="Weapon Cache — War Axes", description="Choose 5 units to equip with a war axe (9×3 blade melee).",
-                image="attacks/axe.png", target="pick", pick_count=5, confirm="equipped with war axes"},
-            {id="weapon_crossbows", flavor="Heavy crossbows. Slow to reload, but one bolt punches through anything.",
-                label="Weapon Cache — Crossbows", description="Choose 4 units to equip with a crossbow (8×2 pierce ranged).",
-                image="attacks/crossbow-human.png", target="pick", pick_count=4, confirm="equipped with crossbows"},
-            {id="weapon_javelins", flavor="Salvaged javelins. One good throw can end a fight before it starts.",
-                label="Weapon Cache — Javelins", description="Choose 4 units to equip with javelins (6×3 pierce ranged).",
-                image="attacks/javelin-human.png", target="pick", pick_count=4, confirm="equipped with javelins"},
-        },
-        stat = {
-            {id="forced_march", flavor="Lighter packs, better boots. Your troops cover ground faster.",
-                label="Forced March", description="Choose 3 units. Each gains +1 movement permanently.",
-                image="attacks/foot-boot.png", target="pick", pick_count=3, confirm="received forced march training"},
-            {id="shield_wall", flavor="Salvaged shields, reinforced and fitted. Your front line holds firmer.",
-                label="Shield Wall", description="Choose 5 units. Each gains +10% blade/pierce/impact resistance.",
-                image="attacks/heater-shield.png", target="pick", pick_count=5, confirm="received shield wall training"},
-            {id="leadership_training", flavor="You promote a veteran to field officer. Nearby troops fight harder under their command.",
-                label="Leadership Training", description="Choose 1 unit. Grants Leadership (+25% damage to adjacent allies).",
-                image="icons/circlet_winged.png", target="pick", pick_count=1, confirm="promoted to field officer"},
-            {id="skirmisher_training", flavor="Your scouts teach the art of slipping past enemy lines.",
-                label="Skirmisher Training", description="Choose 3 units. Grants Skirmisher (ignore enemy ZOC).",
-                image="icons/cloak_leather_brown.png", target="pick", pick_count=3, confirm="received skirmisher training"},
-            {id="healers_knowledge", flavor="A field medic joins your warband and trains one of your soldiers in the healing arts.",
-                label="Healer's Knowledge", description="Choose 1 unit. Grants Heals +4 ability.",
-                image="icons/potion_green_small.png", target="pick", pick_count=1, confirm="trained in the healing arts"},
+        amplifier = {
+            {id="the_elven_way", flavor="Your archers study elven technique. Each draw of the bow yields one more arrow in the volley.",
+                label="The Elven Way", description="All pierce ranged attacks gain +1 extra strike.",
+                image="attacks/bow-elven.png", target="auto", confirm="Pierce ranged attacks gained +1 strike"},
+            {id="the_possessed", flavor="Dark spirits answer your call. Three of your warriors open themselves to the hunger.",
+                label="The Possessed", description="Choose 3 units: gain Drain on melee. All Drain units heal 75% instead of 50%.",
+                image="attacks/curse.png", target="pick", pick_count=3, confirm="received the dark gift"},
+            {id="plague_lord", flavor="Death is no longer the end — it's a recruitment tool. The fallen rise to serve.",
+                label="Plague Lord", description="Choose 3 units: their melee attacks gain Plague (kills become Walking Corpses on your side).",
+                image="attacks/staff-plague.png", target="pick", pick_count=3, confirm="received Plague"},
+            {id="deathless_march", flavor="Your warband refuses to die. Sheer will holds them together when their bodies should fail.",
+                label="Deathless March", description="First time each unit would die per battle, survives at 1 HP instead.",
+                image="icons/steel_armor.png", target="auto", confirm="Deathless March activated for the rest of the run"},
+            {id="double_loot", flavor="Your scouts learn to read the battlefield for hidden caches. Twice the salvage, twice the opportunity.",
+                label="Scavenger's Instinct", description="2 loot chests spawn per battle for the rest of the run.",
+                image="icons/key_silver.png", target="auto", confirm="Double loot enabled for the rest of the run"},
         },
     },
 }
 
--- Boss-specific rewards (50% chance to override the random pick in their category)
+-- Boss-specific rewards (50% chance to replace one amplifier slot)
 BR.boss_rewards = {
-    greyhelm    = {cat="stat",   id="greyhelm_steadfast", flavor="You study the dead commander's formation notes. His stubbornness was a weapon — now it's yours.",
-        label="Greyhelm's Steadfast", description="Choose 2 units. Grants Steadfast (double resist when defending, max 50%).",
-        image="icons/helmet_great2.png", target="pick", pick_count=2, confirm="received Greyhelm's Steadfast"},
-    briarwen    = {cat="stat",   id="briarwen_regen", flavor="A living broach, pulsing with green light, pulled from the druid's staff. The forest's magic lingers.",
-        label="Thornweave Broach", description="Choose 1 unit. Grants Regenerates +8 HP/turn.",
-        image="icons/jewelry_butterfly_pin.png", target="pick", pick_count=1, confirm="received the Thornweave Broach"},
-    maggash     = {cat="weapon", id="maggash_berserk", flavor="Something changed in the soldiers who survived the horde. They fight like cornered animals now.",
-        label="Berserker's Fury", description="Choose 2 units. Adds Berserk to their melee attack.",
-        image="attacks/frenzy.png", target="pick", pick_count=2, confirm="received Berserker's Fury"},
-    pale_conductor = {cat="weapon", id="conductor_drain", flavor="The necromancer's staff hums with dark energy. Those who wield it feel their wounds close with every strike.",
-        label="Conductor's Baton", description="Choose 2 units. Grants Drain on melee attacks.",
-        image="attacks/touch-undead.png", target="pick", pick_count=2, confirm="received the Conductor's Baton"},
-    sithrak     = {cat="weapon", id="sithrak_fire", flavor="Alchemists salvage the drake's fire glands and distill them into throwable flasks. They burn hot and fast.",
-        label="Drakefire Flasks", description="Choose 3 units. Adds a 4×3 fire ranged attack.",
-        image="attacks/ember.png", target="pick", pick_count=3, confirm="equipped with drakefire flasks"},
-    ironband    = {cat="stat",   id="ironband_discipline", flavor="You study how five fighters held a pass against an army. Their discipline becomes your doctrine.",
-        label="Ironband's Discipline", description="Choose 3 units. Each gains +1 movement AND +10% physical resistance.",
-        image="icons/breastplate2.png", target="pick", pick_count=3, confirm="received Ironband's Discipline"},
+    greyhelm = {id="greyhelm_formation", flavor="You study the dead commander's formation. His stubbornness was a weapon — now it's yours.",
+        label="Greyhelm's Formation", description="Choose 3 units: gain Steadfast + Heals +4.",
+        image="icons/shield_tower.png", target="pick", pick_count=3, confirm="received Greyhelm's Formation"},
+    briarwen = {id="briarwen_roothold", flavor="A living broach, pulsing with green light, pulled from the druid's staff. The forest's magic lingers.",
+        label="Briarwen's Blessing", description="Choose 2 units: gain Regenerates (+8 HP/turn) + Ambush (hide in forest).",
+        image="icons/jewelry_butterfly_pin.png", target="pick", pick_count=2, confirm="received Briarwen's Blessing"},
+    maggash = {id="maggash_frenzy", flavor="Something changed in the soldiers who survived the horde. They fight like cornered animals now.",
+        label="Maggash's Frenzy", description="Choose 3 units: gain Berserk on melee + 8 max HP.",
+        image="attacks/frenzy.png", target="pick", pick_count=3, confirm="received Maggash's Frenzy"},
+    pale_conductor = {id="conductor_baton", flavor="The necromancer's staff hums with dark energy. In the right hands, it could raise an army.",
+        label="The Conductor's Baton", description="Choose 1 unit: gains 7×3 arcane melee with Drain + Plague.",
+        image="attacks/curse.png", target="pick", pick_count=1, confirm="received the Conductor's Baton"},
+    sithrak = {id="sithrak_flamebreath", flavor="Alchemists salvage the drake's fire glands. The flames can be harnessed — and the heat endured.",
+        label="Sithrak's Flamebreath", description="Choose 3 units: each gains 8×2 fire ranged + 30% fire resistance.",
+        image="attacks/ember.png", target="pick", pick_count=3, confirm="equipped with Sithrak's Flamebreath"},
+    ironband = {id="ironband_oath", flavor="You study how five fighters held a pass against an army. Their discipline becomes your doctrine.",
+        label="Ironband's Oath", description="Choose 3 units: gain Leadership + Skirmisher + 4 max HP.",
+        image="icons/circlet_winged.png", target="pick", pick_count=3, confirm="received Ironband's Oath"},
 }
 
 -- Helper: pick 1 random from a category pool
@@ -206,33 +189,51 @@ function BR._resolve_unlock(reward)
     return r
 end
 
--- Pick 3 rewards: 1 per category. Boss-specific has 50% to override its category.
+-- Pick 3 rewards: 1 composition + 2 from amplifier pool.
+-- One amplifier slot has 50% chance to be replaced by boss-specific reward.
 function BR.pick_options(tier, boss_id)
     local tier_data = BR.rewards[tier]
     if not tier_data then return {} end
 
     local picks = {}
-    local cats = {"recruit", "weapon", "stat"}
-    local boss_reward = boss_id and BR.boss_rewards[boss_id] or nil
 
-    for _, cat in ipairs(cats) do
-        local pool = tier_data[cat]
-        if not pool or #pool == 0 then goto continue end
-
-        -- Check if boss reward belongs to this category and wins the 50% roll
-        if boss_reward and boss_reward.cat == cat and wesnoth.random(1, 2) == 1 then
-            picks[#picks+1] = BR._resolve_unlock(boss_reward)
-        else
-            picks[#picks+1] = BR._resolve_unlock(pick_one(pool))
-        end
-
-        ::continue::
+    -- Slot 1: composition
+    local comp = tier_data.composition
+    if comp and #comp > 0 then
+        picks[#picks+1] = BR._resolve_unlock(comp[wesnoth.random(1, #comp)])
     end
+
+    -- Slots 2-3: from amplifier pool
+    local amp_pool = tier_data.amplifier
+    if not amp_pool or #amp_pool == 0 then return picks end
+
+    -- Copy pool so we can remove picks without mutating
+    local available = {}
+    for _, r in ipairs(amp_pool) do available[#available+1] = r end
+
+    local boss_reward = boss_id and BR.boss_rewards[boss_id] or nil
+    local boss_used = false
+
+    for slot = 1, 2 do
+        -- 50% chance for boss reward to replace the FIRST amplifier slot
+        if not boss_used and boss_reward and slot == 1 and wesnoth.random(1, 2) == 1 then
+            picks[#picks+1] = boss_reward
+            boss_used = true
+        else
+            if #available > 0 then
+                local idx = wesnoth.random(1, #available)
+                picks[#picks+1] = available[idx]
+                table.remove(available, idx)
+            end
+        end
+    end
+
     return picks
 end
 
--- Apply a reward. reward = the reward table, units = list of proxy units (for pick-type)
+-- Apply a reward
 function BR.apply(reward_id, units, reward)
+    -- === COMPOSITION REWARDS ===
     if reward_id == "unlock_l2" then
         BR._unlock_recruit(2, reward and reward._resolved_unit)
     elseif reward_id == "unlock_l3" then
@@ -240,14 +241,8 @@ function BR.apply(reward_id, units, reward)
     elseif reward_id == "veterans_boon" then
         for _, u in ipairs(wesnoth.units.find_on_recall{side=1}) do
             u.experience = u.experience + math.floor(u.max_experience * 0.25)
-            if u.experience >= u.max_experience then
-                u.experience = u.max_experience - 1
-            end
+            if u.experience >= u.max_experience then u.experience = u.max_experience - 1 end
         end
-    elseif reward_id == "war_chest" then
-        wesnoth.wml_actions.gold{side=1, amount=120}
-    elseif reward_id == "massive_war_chest" then
-        wesnoth.wml_actions.gold{side=1, amount=250}
     elseif reward_id == "loyal_champion" or reward_id == "loyal_champion_l2" then
         local pick = reward._resolved_unit
         if not pick then
@@ -256,238 +251,192 @@ function BR.apply(reward_id, units, reward)
                 or {"Swordsman","Pikeman","Knight","Elvish Ranger","Orcish Warrior","Troll","Bone Shooter","Fire Drake","Dwarvish Steelclad"}
             pick = pool[wesnoth.random(1, #pool)]
         end
-        local u = wesnoth.units.create{
-            type=pick, side=1, generate_name=true,
-            random_traits=true, random_gender=true,
-        }
-        u:add_modification("trait", {
-            id="loyal", name="loyal",
-            description="Zero upkeep",
-            T.effect{apply_to="loyal"},
-            T.effect{apply_to="overlay", add="misc/loyal-icon.png"},
-        })
+        local u = wesnoth.units.create{type=pick, side=1, generate_name=true, random_traits=true, random_gender=true}
+        u:add_modification("trait", {id="loyal", name="loyal", description="Zero upkeep",
+            T.effect{apply_to="loyal"}, T.effect{apply_to="overlay", add="misc/loyal-icon.png"}})
         u:to_recall()
         wesnoth.set_variable("loyal_champion_id", u.id)
-    elseif reward_id == "weapon_spears" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {
-                id = "boss_reward_spear",
-                name = "War Spear",
-                T.effect{
-                    apply_to = "new_attack",
-                    name = "war spear",
-                    description = "war spear",
-                    icon = "attacks/spear.png",
-                    type = "pierce",
-                    range = "melee",
-                    damage = 7,
-                    number = 3,
-                    T.specials{
-                        T.chance_to_hit{
-                            id = "firststrike",
-                            name = "firststrike",
-                            description = "This unit always strikes first, even when defending.",
-                            active_on = "offense",
-                        },
-                    },
-                },
-            })
-        end
-    elseif reward_id == "weapon_bows" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {
-                id = "boss_reward_bow",
-                name = "Shortbow",
-                T.effect{
-                    apply_to = "new_attack",
-                    name = "shortbow",
-                    description = "shortbow",
-                    icon = "attacks/bow-short.png",
-                    type = "pierce",
-                    range = "ranged",
-                    damage = 5,
-                    number = 3,
-                },
-            })
-        end
-    elseif reward_id == "weapon_axes" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {
-                id = "boss_reward_axe",
-                name = "War Axe",
-                T.effect{
-                    apply_to = "new_attack",
-                    name = "war axe",
-                    description = "war axe",
-                    icon = "attacks/axe.png",
-                    type = "blade",
-                    range = "melee",
-                    damage = 9,
-                    number = 3,
-                },
-            })
-        end
-    elseif reward_id == "weapon_knives" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_knives", name="Throwing Knives",
-                T.effect{apply_to="new_attack", name="throwing knives", description="throwing knives",
-                    icon="attacks/dagger-thrown-human.png", type="blade", range="ranged", damage=4, number=3,
-                    T.specials{T.chance_to_hit{id="marksman", name="marksman",
-                        description="When used offensively, this attack always has at least a 60% chance to hit.",
-                        value=60, cumulative="no", active_on="offense"}}}})
-        end
-    elseif reward_id == "weapon_maces" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_mace", name="Mace",
-                T.effect{apply_to="new_attack", name="mace", description="mace",
-                    icon="attacks/mace.png", type="impact", range="melee", damage=8, number=2}})
-        end
-    elseif reward_id == "weapon_crossbows" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_xbow", name="Crossbow",
-                T.effect{apply_to="new_attack", name="crossbow", description="crossbow",
-                    icon="attacks/crossbow-human.png", type="pierce", range="ranged", damage=8, number=2}})
-        end
-    elseif reward_id == "weapon_javelins" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_javelin", name="Javelin",
-                T.effect{apply_to="new_attack", name="javelin", description="javelin",
-                    icon="attacks/javelin-human.png", type="pierce", range="ranged", damage=6, number=3}})
-        end
-    elseif reward_id == "ironblood" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_iron", name="Ironblood",
-                T.effect{apply_to="hitpoints", increase_total=6}})
-        end
-    elseif reward_id == "battle_drills" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_drills", name="Battle Drills",
-                T.effect{apply_to="defense", replace=false, T.defense{
-                    castle=-10, village=-10, flat=-10, forest=-10, hills=-10, mountain=-10, cave=-10, shallow_water=-10, swamp_water=-10}}})
-        end
-    elseif reward_id == "weapon_daggers" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_dagger", name="Dagger",
-                T.effect{apply_to="new_attack", name="dagger", description="dagger",
-                    icon="attacks/dagger-human.png", type="blade", range="melee", damage=4, number=3,
-                    T.specials{T.damage{id="backstab", name="backstab",
-                        description="When used offensively, this attack deals double damage if there is an enemy of the target on the opposite side.",
-                        multiply=2, active_on="offense",
-                        T.filter_opponent{formula="enemy_of(self, flanker) and flanker.valid"}}}}})
-        end
-    elseif reward_id == "weapon_torches" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_torch", name="Torch",
-                T.effect{apply_to="new_attack", name="torch", description="torch",
-                    icon="attacks/torch.png", type="fire", range="melee", damage=6, number=2}})
-        end
-    elseif reward_id == "weapon_slings" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_sling", name="Sling",
-                T.effect{apply_to="new_attack", name="sling", description="sling",
-                    icon="attacks/sling.png", type="impact", range="ranged", damage=6, number=2}})
-        end
-    elseif reward_id == "fearless_training" then
-        for _, u in ipairs(units) do
-            u:add_modification("trait", {id="fearless", name="fearless",
-                description="Fights normally during unfavorable time of day.",
+    elseif reward_id == "legendary_hero" then
+        local hero = wesnoth.units.find_on_map{id="hero"}[1]
+        if not hero then hero = wesnoth.units.find_on_recall{id="hero"}[1] end
+        if hero then
+            hero:add_modification("object", {id="legendary_hero", name="Legendary Hero",
+                T.effect{apply_to="new_ability", T.abilities{
+                    T.regenerate{id="regenerates", name="regenerates",
+                        description="The unit will heal itself 8 HP per turn.", value=8},
+                    T.leadership{id="leadership", name="leadership",
+                        description="Adjacent units of lower level will do more damage in combat.",
+                        value="(25 * (level - other.level))", cumulative="no", affect_self="no",
+                        T.affect_adjacent{T.filter{formula="level < other.level"}}}}},
                 T.effect{apply_to="fearless", set="yes"}})
         end
-    elseif reward_id == "feeding_training" then
+
+    -- === BUILD AMPLIFIER REWARDS ===
+    elseif reward_id == "virulent_strain" then
+        wesnoth.set_variable("buff_virulent_strain", "yes")
+    elseif reward_id == "cutthroat_doctrine" then
+        wesnoth.set_variable("buff_cutthroat_doctrine", "yes")
+    elseif reward_id == "arcane_mastery" then
+        wesnoth.set_variable("buff_arcane_mastery", "yes")
+    elseif reward_id == "steady_aim" then
+        -- +1 damage to all pierce ranged attacks on all side 1 units
+        for _, u in ipairs(wesnoth.units.find_on_map{side=1}) do
+            u:add_modification("object", {id="buff_steady_aim", name="Steady Aim",
+                T.effect{apply_to="attack", range="ranged", type="pierce", increase_damage=1}})
+        end
+        for _, u in ipairs(wesnoth.units.find_on_recall{side=1}) do
+            u:add_modification("object", {id="buff_steady_aim", name="Steady Aim",
+                T.effect{apply_to="attack", range="ranged", type="pierce", increase_damage=1}})
+        end
+        wesnoth.set_variable("buff_steady_aim", "yes")
+    elseif reward_id == "blood_harvest" then
         for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_feeding", name="Feeding Training",
+            u:add_modification("object", {id="buff_blood_harvest", name="Blood Harvest",
                 T.effect{apply_to="new_ability",
                     T.abilities{T.feeding{id="feeding", name="feeding",
                         description="This unit gains 1 hitpoint added to its maximum whenever it kills a unit."}}}})
         end
-    elseif reward_id == "ambush_training" then
+        wesnoth.set_variable("buff_blood_harvest", "yes")
+    elseif reward_id == "thundering_charge" then
+        local mounted = {
+            ["Elvish Scout"]=true,["Elvish Rider"]=true,["Elvish Outrider"]=true,
+            ["Gryphon Rider"]=true,["Gryphon Master"]=true,
+            ["Cavalryman"]=true,["Dragoon"]=true,["Cavalier"]=true,
+            ["Horseman"]=true,["Knight"]=true,["Lancer"]=true,["Paladin"]=true,["Grand Knight"]=true,
+            ["Skeleton Rider"]=true,["Bone Knight"]=true,
+            ["Wolf Rider"]=true,["Goblin Knight"]=true,["Goblin Pillager"]=true,["Direwolf Rider"]=true,
+        }
+        local function apply_charge(u)
+            if mounted[u.type] then
+                u:add_modification("object", {id="buff_thundering_charge", name="Thundering Charge",
+                    T.effect{apply_to="movement", increase=1},
+                    T.effect{apply_to="attack", range="melee",
+                        T.set_specials{T.damage{id="charge", name="charge",
+                            description="This attack deals double damage when used offensively, but the attacker also takes double damage.",
+                            multiply=2, active_on="offense", T.filter_opponent{}}}}})
+            end
+        end
+        for _, u in ipairs(wesnoth.units.find_on_map{side=1}) do apply_charge(u) end
+        for _, u in ipairs(wesnoth.units.find_on_recall{side=1}) do apply_charge(u) end
+        wesnoth.set_variable("buff_thundering_charge", "yes")
+    elseif reward_id == "drakefire_doctrine" then
+        local function apply_fire(u)
+            u:add_modification("object", {id="buff_drakefire", name="Drakefire Doctrine",
+                T.effect{apply_to="attack", type="fire", increase_damage=2}})
+        end
+        for _, u in ipairs(wesnoth.units.find_on_map{side=1}) do apply_fire(u) end
+        for _, u in ipairs(wesnoth.units.find_on_recall{side=1}) do apply_fire(u) end
+        wesnoth.set_variable("buff_drakefire_doctrine", "yes")
+    elseif reward_id == "shatterpoint" then
+        local function apply_shatter(u)
+            u:add_modification("object", {id="buff_shatterpoint", name="Shatterpoint",
+                T.effect{apply_to="attack", range="melee", type="impact", increase_attacks=1}})
+        end
+        for _, u in ipairs(wesnoth.units.find_on_map{side=1}) do apply_shatter(u) end
+        for _, u in ipairs(wesnoth.units.find_on_recall{side=1}) do apply_shatter(u) end
+        wesnoth.set_variable("buff_shatterpoint", "yes")
+    elseif reward_id == "frostbite" then
+        wesnoth.set_variable("buff_frostbite", "yes")
+    elseif reward_id == "spear_wall" then
+        local function apply_spear(u)
+            u:add_modification("object", {id="buff_spear_wall", name="Spear Wall",
+                T.effect{apply_to="attack", specials="firststrike", increase_damage=2}})
+        end
+        for _, u in ipairs(wesnoth.units.find_on_map{side=1}) do apply_spear(u) end
+        for _, u in ipairs(wesnoth.units.find_on_recall{side=1}) do apply_spear(u) end
+        wesnoth.set_variable("buff_spear_wall", "yes")
+    elseif reward_id == "double_loot" then
+        wesnoth.set_variable("buff_double_loot", "yes")
+    elseif reward_id == "the_elven_way" then
+        local function apply_elven(u)
+            u:add_modification("object", {id="buff_elven_way", name="The Elven Way",
+                T.effect{apply_to="attack", range="ranged", type="pierce", increase_attacks=1}})
+        end
+        for _, u in ipairs(wesnoth.units.find_on_map{side=1}) do apply_elven(u) end
+        for _, u in ipairs(wesnoth.units.find_on_recall{side=1}) do apply_elven(u) end
+        wesnoth.set_variable("buff_the_elven_way", "yes")
+    elseif reward_id == "the_possessed" then
         for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_ambush", name="Ambush Training",
-                T.effect{apply_to="new_ability",
-                    T.abilities{T.hides{id="ambush", name="ambush",
+            u:add_modification("object", {id="buff_possessed", name="The Possessed",
+                T.effect{apply_to="attack", range="melee",
+                    T.set_specials{T.drains{id="drains", name="drains",
+                        description="This unit drains health from living units, healing itself for half the damage dealt."}}}})
+        end
+        wesnoth.set_variable("buff_the_possessed", "yes")
+    elseif reward_id == "plague_lord" then
+        for _, u in ipairs(units) do
+            u:add_modification("object", {id="buff_plague_lord", name="Plague Lord",
+                T.effect{apply_to="attack", range="melee",
+                    T.set_specials{T.plague{id="plague", name="plague",
+                        description="When a unit is killed by this attack, it is replaced with a Walking Corpse.",
+                        type="Walking Corpse"}}}})
+        end
+    elseif reward_id == "deathless_march" then
+        wesnoth.set_variable("buff_deathless_march", "yes")
+
+    -- === BOSS-SPECIFIC REWARDS ===
+    elseif reward_id == "greyhelm_formation" then
+        for _, u in ipairs(units) do
+            u:add_modification("object", {id="boss_greyhelm", name="Greyhelm's Formation",
+                T.effect{apply_to="new_ability", T.abilities{
+                    T.resistance{id="steadfast", name="steadfast",
+                        description="This unit's resistances are doubled when defending. (Capped at 50%)",
+                        multiply=2, max_value=50, active_on="defense"},
+                    T.heals{id="healing", name="heals +4",
+                        description="Allows the unit to heal adjacent allied units at the beginning of each turn.",
+                        value=4, affect_self="no", affect_allies="yes",
+                        T.affect_adjacent{}}}}})
+        end
+    elseif reward_id == "briarwen_roothold" then
+        for _, u in ipairs(units) do
+            u:add_modification("object", {id="boss_briarwen", name="Briarwen's Blessing",
+                T.effect{apply_to="new_ability", T.abilities{
+                    T.regenerate{id="regenerates", name="regenerates",
+                        description="The unit will heal itself 8 HP per turn.", value=8},
+                    T.hides{id="ambush", name="ambush",
                         description="This unit can hide in forest and remain undetected by enemies.",
                         affect_self="yes",
                         T.filter_self{T.filter_location{terrain="*^F*"}}}}}})
         end
-    elseif reward_id == "forced_march" then
+    elseif reward_id == "maggash_frenzy" then
         for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_march", name="Forced March",
-                T.effect{apply_to="movement", increase=1}})
-        end
-    elseif reward_id == "shield_wall" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_shield", name="Shield Wall",
-                T.effect{apply_to="resistance", replace=false,
-                    T.resistance{blade=-10, pierce=-10, impact=-10}}})
-        end
-    elseif reward_id == "leadership_training" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_leader", name="Leadership Training",
-                T.effect{apply_to="new_ability",
-                    T.abilities{T.leadership{id="leadership", name="leadership",
-                        description="Adjacent units of lower level will do more damage in combat.",
-                        value="(25 * (level - other.level))", cumulative="no", affect_self="no",
-                        T.affect_adjacent{T.filter{formula="level < other.level"}}}}}})
-        end
-    elseif reward_id == "skirmisher_training" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_skirm", name="Skirmisher Training",
-                T.effect{apply_to="new_ability",
-                    T.abilities{T.skirmisher{id="skirmisher", name="skirmisher",
-                        description="This unit can move through enemy zones of control without being slowed."}}}})
-        end
-    elseif reward_id == "healers_knowledge" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_reward_heal", name="Healer's Knowledge",
-                T.effect{apply_to="new_ability",
-                    T.abilities{T.heals{id="healing", name="heals +4",
-                        description="Allows the unit to heal adjacent allied units.",
-                        value=4, affect_self="no"}}}})
-        end
-    -- Boss-specific rewards
-    elseif reward_id == "greyhelm_steadfast" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_greyhelm", name="Greyhelm's Steadfast",
-                T.effect{apply_to="new_ability",
-                    T.abilities{T.resistance{id="steadfast", name="steadfast",
-                        description="This unit's resistances are doubled when defending. (Capped at 50%)",
-                        multiply=2, max_value=50, active_on="defense"}}}})
-        end
-    elseif reward_id == "briarwen_regen" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_briarwen", name="Thornweave Broach",
-                T.effect{apply_to="new_ability",
-                    T.abilities{T.regenerate{id="regenerates", name="regenerates",
-                        description="The unit will heal itself 8 HP per turn.",
-                        value=8}}}})
-        end
-    elseif reward_id == "maggash_berserk" then
-        for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_maggash", name="Berserker's Fury",
+            u:add_modification("object", {id="boss_maggash", name="Maggash's Frenzy",
                 T.effect{apply_to="attack", range="melee",
                     T.set_specials{T.berserk{id="berserk", name="berserk",
                         description="Whether attacking or defending, this unit will fight until either it or its enemy lies dead.",
-                        value=30}}}})
+                        value=30}}},
+                T.effect{apply_to="hitpoints", increase_total=8}})
         end
-    elseif reward_id == "conductor_drain" then
+    elseif reward_id == "conductor_baton" then
         for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_conductor", name="Conductor's Baton",
-                T.effect{apply_to="attack", range="melee",
-                    T.set_specials{T.drains{id="drains", name="drains",
-                        description="This unit drains health from living units, healing itself for half the amount of damage it deals."}}}})
+            u:add_modification("object", {id="boss_conductor", name="The Conductor's Baton",
+                T.effect{apply_to="new_attack", name="baton", description="baton",
+                    icon="attacks/curse.png", type="arcane", range="melee", damage=7, number=3,
+                    T.specials{
+                        T.drains{id="drains", name="drains",
+                            description="This unit drains health from living units, healing itself for half the damage dealt."},
+                        T.plague{id="plague", name="plague",
+                            description="When a unit is killed by this attack, it is replaced with a Walking Corpse.",
+                            type="Walking Corpse"}}}})
         end
-    elseif reward_id == "sithrak_fire" then
+    elseif reward_id == "sithrak_flamebreath" then
         for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_sithrak", name="Drakefire Flasks",
-                T.effect{apply_to="new_attack", name="drakefire flask", description="drakefire flask",
-                    icon="attacks/ember.png", type="fire", range="ranged", damage=4, number=3}})
+            u:add_modification("object", {id="boss_sithrak", name="Sithrak's Flamebreath",
+                T.effect{apply_to="new_attack", name="flamebreath", description="flamebreath",
+                    icon="attacks/ember.png", type="fire", range="ranged", damage=8, number=2},
+                T.effect{apply_to="resistance", replace=false, T.resistance{fire=-30}}})
         end
-    elseif reward_id == "ironband_discipline" then
+    elseif reward_id == "ironband_oath" then
         for _, u in ipairs(units) do
-            u:add_modification("object", {id="boss_ironband", name="Ironband's Discipline",
-                T.effect{apply_to="movement", increase=1},
-                T.effect{apply_to="resistance", replace=false,
-                    T.resistance{blade=-10, pierce=-10, impact=-10}}})
+            u:add_modification("object", {id="boss_ironband", name="Ironband's Oath",
+                T.effect{apply_to="new_ability", T.abilities{
+                    T.leadership{id="leadership", name="leadership",
+                        description="Adjacent units of lower level will do more damage in combat.",
+                        value="(25 * (level - other.level))", cumulative="no", affect_self="no",
+                        T.affect_adjacent{T.filter{formula="level < other.level"}}},
+                    T.skirmisher{id="skirmisher", name="skirmisher",
+                        description="This unit can move through enemy zones of control without being slowed."}}},
+                T.effect{apply_to="hitpoints", increase_total=4}})
         end
     end
 end

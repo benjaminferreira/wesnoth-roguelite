@@ -100,6 +100,7 @@ H.maybe_fixture(tiles, W, HT, "ruins", 15)
 H.maybe_fixture(tiles, W, HT, "pit", 15)
 H.maybe_fixture(tiles, W, HT, "dead_grove", 25)
 H.maybe_fixture(tiles, W, HT, "desert_bones", 20)
+H.maybe_fixture(tiles, W, HT, "rainforest_thicket", 10)
 
 -- Floor variety
 for y = 2, HT-1 do for x = 2, W-1 do

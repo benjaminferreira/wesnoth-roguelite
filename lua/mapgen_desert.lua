@@ -19,8 +19,7 @@ H.maybe_fixture(tiles, W, HT, "bone_pile", 25)
 H.maybe_fixture(tiles, W, HT, "pit", 10)
 H.maybe_fixture(tiles, W, HT, "stone_circle", 15)
 H.maybe_fixture(tiles, W, HT, "rocky_ridge", 35)
-H.maybe_fixture(tiles, W, HT, "brazier_circle", 10)
-H.maybe_fixture(tiles, W, HT, "rainforest_thicket", 10)
+H.maybe_fixture(tiles, W, HT, "rainforest_thicket", 20)
 
 -- Convert fixtures to desert variants
 for y = 1, HT do for x = 1, W do

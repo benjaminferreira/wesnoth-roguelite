@@ -311,7 +311,7 @@ function BR.apply(reward_id, units, reward)
                 u:add_modification("object", {id="buff_thundering_charge", name="Thundering Charge",
                     T.effect{apply_to="movement", increase=1},
                     T.effect{apply_to="attack", range="melee",
-                        T.set_specials{T.damage{id="charge", name="charge",
+                        T.set_specials{mode="append",T.damage{id="charge", name="charge",
                             description="This attack deals double damage when used offensively, but the attacker also takes double damage.",
                             multiply=2, active_on="offense", T.filter_opponent{}}}}})
             end
@@ -359,7 +359,7 @@ function BR.apply(reward_id, units, reward)
         for _, u in ipairs(units) do
             u:add_modification("object", {id="buff_possessed", name="The Possessed",
                 T.effect{apply_to="attack", range="melee",
-                    T.set_specials{T.drains{id="drains", name="drains",
+                    T.set_specials{mode="append",T.drains{id="drains", name="drains",
                         description="This unit drains health from living units, healing itself for half the damage dealt."}}}})
         end
         wesnoth.set_variable("buff_the_possessed", "yes")
@@ -367,7 +367,7 @@ function BR.apply(reward_id, units, reward)
         for _, u in ipairs(units) do
             u:add_modification("object", {id="buff_plague_lord", name="Plague Lord",
                 T.effect{apply_to="attack", range="melee",
-                    T.set_specials{T.plague{id="plague", name="plague",
+                    T.set_specials{mode="append",T.plague{id="plague", name="plague",
                         description="When a unit is killed by this attack, it is replaced with a Walking Corpse.",
                         type="Walking Corpse"}}}})
         end
@@ -402,7 +402,7 @@ function BR.apply(reward_id, units, reward)
         for _, u in ipairs(units) do
             u:add_modification("object", {id="boss_maggash", name="Maggash's Frenzy",
                 T.effect{apply_to="attack", range="melee",
-                    T.set_specials{T.berserk{id="berserk", name="berserk",
+                    T.set_specials{mode="append",T.berserk{id="berserk", name="berserk",
                         description="Whether attacking or defending, this unit will fight until either it or its enemy lies dead.",
                         value=30}}},
                 T.effect{apply_to="hitpoints", increase_total=8}})

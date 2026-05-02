@@ -359,7 +359,7 @@ LOOT.items = {
             apply=function(u)
                 u:add_modification("object", {id="loot_marksman", name="Marksman's Eye",
                     T.effect{apply_to="attack", range="ranged",
-                        T.set_specials{T.chance_to_hit{id="marksman", name="marksman",
+                        T.set_specials{mode="append",T.chance_to_hit{id="marksman", name="marksman",
                             description="When used offensively, this attack always has at least a 60% chance to hit.",
                             value=60, cumulative="no", active_on="offense"}}}})
             end},
@@ -403,7 +403,7 @@ LOOT.items = {
             apply=function(u)
                 u:add_modification("object", {id="loot_slow_venom", name="Slow Venom",
                     T.effect{apply_to="attack", range="ranged",
-                        T.set_specials{T.slow{id="slow", name="slow",
+                        T.set_specials{mode="append",T.slow{id="slow", name="slow",
                             description="This attack slows the target."}}}})
             end},
     },
@@ -600,7 +600,7 @@ LOOT.items = {
             apply=function(u)
                 u:add_modification("object", {id="loot_berserk_torc", name="Berserker's Torc",
                     T.effect{apply_to="attack", range="melee",
-                        T.set_specials{T.berserk{id="berserk", name="berserk",
+                        T.set_specials{mode="append",T.berserk{id="berserk", name="berserk",
                             description="This unit fights until one side is dead.", value=30}}},
                     T.effect{apply_to="attack", range="melee", increase_damage=1},
                     T.effect{apply_to="hitpoints", increase_total=1}})
@@ -613,7 +613,7 @@ LOOT.items = {
             apply=function(u)
                 u:add_modification("object", {id="loot_plague_staff", name="Plague Staff",
                     T.effect{apply_to="attack", range="melee",
-                        T.set_specials{T.plague{id="plague", name="plague",
+                        T.set_specials{mode="append",T.plague{id="plague", name="plague",
                             description="When a unit is killed by this attack, it is replaced with a Walking Corpse.",
                             type="Walking Corpse"}}}})
             end},
